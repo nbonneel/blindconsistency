@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html>
+<!-- Created on October 29, 2012 by texi2html 1.82 -->
+<!--
+texi2html was written by: 
+            Lionel Cons <Lionel.Cons@cern.ch> (original author)
+            Karl Berry  <karl@freefriends.org>
+            Olaf Bachmann <obachman@mathematik.uni-kl.de>
+            and many others.
+Maintained by: Many creative people.
+Send bugs and suggestions to <texi2html-bug@nongnu.org>
+
+-->
+<head>
+<title>FFmpeg documentation : : 1. Syntax</title>
+
+<meta name="description" content=": 1. Syntax">
+<meta name="keywords" content="FFmpeg documentation : : 1. Syntax">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="texi2html 1.82">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+<!--
+.container {
+  margin-right: auto;
+  margin-left: auto;
+  width: 1070px;
+}
+body {
+  font-size: 14px;
+  line-height: 20px;
+  color: #333333;
+  background-color: #ffffff;
+}
+a {
+  color: #0088cc;
+  text-decoration: none;
+}
+a:hover {
+  color: #005580;
+  text-decoration: underline;
+}
+p {
+  margin: 0 0 10px;
+}
+h2,
+h3,
+h4 {
+  margin: 10px 0;
+  font-family: inherit;
+  font-weight: bold;
+  line-height: 1;
+  border-color: #D6E9C6;
+  color: #468847;
+  border-style: solid;
+  border-width: 0 0 1px;
+  padding-left: 0.5em;
+}
+
+h1 a,
+h2 a,
+h3 a,
+h4 a {
+  color: inherit;
+}
+h1 {
+  font-size: 30px;
+  line-height: 40px;
+}
+h2 {
+  font-size: 20px;
+  line-height: 40px;
+}
+h3 {
+  font-size: 18px;
+  line-height: 40px;
+}
+code,
+pre {
+  padding: 0 3px 2px;
+  font-family: monospace;
+  font-size: 12px;
+  color: #333333;
+  border-radius: 3px;
+}
+pre {
+  display: block;
+  padding: 9.5px;
+  margin: 0 0 10px;
+  font-size: 13px;
+  line-height: 20px;
+  word-break: break-all;
+  word-wrap: break-word;
+  white-space: pre;
+  white-space: pre-wrap;
+  background-color: #f5f5f5;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+code {
+  padding: 2px 4px;
+  color: #d14;
+  background-color: #f7f7f9;
+  border: 1px solid #e1e1e8;
+}
+pre code {
+  padding: 0;
+  color: inherit;
+  background-color: transparent;
+  border: 0;
+}
+.alert {
+  padding: 8px 35px 8px 14px;
+  margin-bottom: 20px;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+  background-color: #fcf8e3;
+  border: 1px solid #fbeed5;
+  border-radius: 4px;
+  color: #c09853;
+}
+
+.alert-danger,
+.alert-error {
+  background-color: #f2dede;
+  border-color: #eed3d7;
+  color: #b94a48;
+}
+.alert-info {
+  background-color: #d9edf7;
+  border-color: #bce8f1;
+  color: #3a87ad;
+}
+
+ul.toc {
+  list-style-type: none;
+}
+-->
+</style>
+
+<link rel="icon" href="favicon.png" type="image/png" />
+</head>
+<body>
+<div class="container">
+
+<a name="Syntax"></a>
+<h1 class="chapter"><a href="syntax.html#toc-Syntax">1. Syntax</a></h1>
+
+<p>This section documents the syntax and formats employed by the FFmpeg
+libraries and tools.
+</p>
+<p><a name="quoting_005fand_005fescaping"></a>
+</p><a name="Quoting-and-escaping"></a>
+<h2 class="section"><a href="syntax.html#toc-Quoting-and-escaping">1.1 Quoting and escaping</a></h2>
+
+<p>FFmpeg adopts the following quoting and escaping mechanism, unless
+explicitly specified. The following rules are applied:
+</p>
+<ul>
+<li>
+<code>'</code> and <code>\</code> are special characters (respectively used for
+quoting and escaping). In addition to them, there might be other
+special characters depending on the specific syntax where the escaping
+and quoting are employed.
+
+</li><li>
+A special character is escaped by prefixing it with a &rsquo;\&rsquo;.
+
+</li><li>
+All characters enclosed between &rdquo; are included literally in the
+parsed string. The quote character <code>'</code> itself cannot be quoted,
+so you may need to close the quote and escape it.
+
+</li><li>
+Leading and trailing whitespaces, unless escaped or quoted, are
+removed from the parsed string.
+</li></ul>
+
+<p>Note that you may need to add a second level of escaping when using
+the command line or a script, which depends on the syntax of the
+adopted shell language.
+</p>
+<p>The function <code>av_get_token</code> defined in
+&lsquo;<tt>libavutil/avstring.h</tt>&rsquo; can be used to parse a token quoted or
+escaped according to the rules defined above.
+</p>
+<p>The tool &lsquo;<tt>tools/ffescape</tt>&rsquo; in the FFmpeg source tree can be used
+to automatically quote or escape a string in a script.
+</p>
+<a name="Examples"></a>
+<h3 class="subsection"><a href="syntax.html#toc-Examples">1.1.1 Examples</a></h3>
+
+<ul>
+<li>
+Escape the string <code>Crime d'Amour</code> containing the <code>'</code> special
+character:
+<table><tr><td>&nbsp;</td><td><pre class="example">Crime d\'Amour
+</pre></td></tr></table>
+
+</li><li>
+The string above contains a quote, so the <code>'</code> needs to be escaped
+when quoting it:
+<table><tr><td>&nbsp;</td><td><pre class="example">'Crime d'\''Amour'
+</pre></td></tr></table>
+
+</li><li>
+Include leading or trailing whitespaces using quoting:
+<table><tr><td>&nbsp;</td><td><pre class="example">'  this string starts and ends with whitespaces  '
+</pre></td></tr></table>
+
+</li><li>
+Escaping and quoting can be mixed together:
+<table><tr><td>&nbsp;</td><td><pre class="example">' The string '\'string\'' is a string '
+</pre></td></tr></table>
+
+</li><li>
+To include a literal <code>\</code> you can use either escaping or quoting:
+<table><tr><td>&nbsp;</td><td><pre class="example">'c:\foo' can be written as c:\\foo
+</pre></td></tr></table>
+</li></ul>
+
+<p><a name="date-syntax"></a>
+</p><a name="Date"></a>
+<h2 class="section"><a href="syntax.html#toc-Date">1.2 Date</a></h2>
+
+<p>The accepted syntax is:
+</p><table><tr><td>&nbsp;</td><td><pre class="example">[(YYYY-MM-DD|YYYYMMDD)[T|t| ]]((HH:MM:SS[.m...]]])|(HHMMSS[.m...]]]))[Z]
+now
+</pre></td></tr></table>
+
+<p>If the value is &quot;now&quot; it takes the current time.
+</p>
+<p>Time is local time unless Z is appended, in which case it is
+interpreted as UTC.
+If the year-month-day part is not specified it takes the current
+year-month-day.
+</p>
+<p><a name="time-duration-syntax"></a>
+</p><a name="Time-duration"></a>
+<h2 class="section"><a href="syntax.html#toc-Time-duration">1.3 Time duration</a></h2>
+
+<p>The accepted syntax is:
+</p><table><tr><td>&nbsp;</td><td><pre class="example">[-]HH:MM:SS[.m...]
+[-]S+[.m...]
+</pre></td></tr></table>
+
+<p><var>HH</var> expresses the number of hours, <var>MM</var> the number a of minutes
+and <var>SS</var> the number of seconds.
+</p>
+<p><a name="video-size-syntax"></a>
+</p><a name="Video-size"></a>
+<h2 class="section"><a href="syntax.html#toc-Video-size">1.4 Video size</a></h2>
+<p>Specify the size of the sourced video, it may be a string of the form
+<var>width</var>x<var>height</var>, or the name of a size abbreviation.
+</p>
+<p>The following abbreviations are recognized:
+</p><dl compact="compact">
+<dt> &lsquo;<samp>sqcif</samp>&rsquo;</dt>
+<dd><p>128x96
+</p></dd>
+<dt> &lsquo;<samp>qcif</samp>&rsquo;</dt>
+<dd><p>176x144
+</p></dd>
+<dt> &lsquo;<samp>cif</samp>&rsquo;</dt>
+<dd><p>352x288
+</p></dd>
+<dt> &lsquo;<samp>4cif</samp>&rsquo;</dt>
+<dd><p>704x576
+</p></dd>
+<dt> &lsquo;<samp>16cif</samp>&rsquo;</dt>
+<dd><p>1408x1152
+</p></dd>
+<dt> &lsquo;<samp>qqvga</samp>&rsquo;</dt>
+<dd><p>160x120
+</p></dd>
+<dt> &lsquo;<samp>qvga</samp>&rsquo;</dt>
+<dd><p>320x240
+</p></dd>
+<dt> &lsquo;<samp>vga</samp>&rsquo;</dt>
+<dd><p>640x480
+</p></dd>
+<dt> &lsquo;<samp>svga</samp>&rsquo;</dt>
+<dd><p>800x600
+</p></dd>
+<dt> &lsquo;<samp>xga</samp>&rsquo;</dt>
+<dd><p>1024x768
+</p></dd>
+<dt> &lsquo;<samp>uxga</samp>&rsquo;</dt>
+<dd><p>1600x1200
+</p></dd>
+<dt> &lsquo;<samp>qxga</samp>&rsquo;</dt>
+<dd><p>2048x1536
+</p></dd>
+<dt> &lsquo;<samp>sxga</samp>&rsquo;</dt>
+<dd><p>1280x1024
+</p></dd>
+<dt> &lsquo;<samp>qsxga</samp>&rsquo;</dt>
+<dd><p>2560x2048
+</p></dd>
+<dt> &lsquo;<samp>hsxga</samp>&rsquo;</dt>
+<dd><p>5120x4096
+</p></dd>
+<dt> &lsquo;<samp>wvga</samp>&rsquo;</dt>
+<dd><p>852x480
+</p></dd>
+<dt> &lsquo;<samp>wxga</samp>&rsquo;</dt>
+<dd><p>1366x768
+</p></dd>
+<dt> &lsquo;<samp>wsxga</samp>&rsquo;</dt>
+<dd><p>1600x1024
+</p></dd>
+<dt> &lsquo;<samp>wuxga</samp>&rsquo;</dt>
+<dd><p>1920x1200
+</p></dd>
+<dt> &lsquo;<samp>woxga</samp>&rsquo;</dt>
+<dd><p>2560x1600
+</p></dd>
+<dt> &lsquo;<samp>wqsxga</samp>&rsquo;</dt>
+<dd><p>3200x2048
+</p></dd>
+<dt> &lsquo;<samp>wquxga</samp>&rsquo;</dt>
+<dd><p>3840x2400
+</p></dd>
+<dt> &lsquo;<samp>whsxga</samp>&rsquo;</dt>
+<dd><p>6400x4096
+</p></dd>
+<dt> &lsquo;<samp>whuxga</samp>&rsquo;</dt>
+<dd><p>7680x4800
+</p></dd>
+<dt> &lsquo;<samp>cga</samp>&rsquo;</dt>
+<dd><p>320x200
+</p></dd>
+<dt> &lsquo;<samp>ega</samp>&rsquo;</dt>
+<dd><p>640x350
+</p></dd>
+<dt> &lsquo;<samp>hd480</samp>&rsquo;</dt>
+<dd><p>852x480
+</p></dd>
+<dt> &lsquo;<samp>hd720</samp>&rsquo;</dt>
+<dd><p>1280x720
+</p></dd>
+<dt> &lsquo;<samp>hd1080</samp>&rsquo;</dt>
+<dd><p>1920x1080
+</p></dd>
+</dl>
+
+<p><a name="video-rate-syntax"></a>
+</p><a name="Video-rate"></a>
+<h2 class="section"><a href="syntax.html#toc-Video-rate">1.5 Video rate</a></h2>
+
+<p>Specify the frame rate of a video, expressed as the number of frames
+generated per second. It has to be a string in the format
+<var>frame_rate_num</var>/<var>frame_rate_den</var>, an integer number, a float
+number or a valid video frame rate abbreviation.
+</p>
+<p>The following abbreviations are recognized:
+</p><dl compact="compact">
+<dt> &lsquo;<samp>ntsc</samp>&rsquo;</dt>
+<dd><p>30000/1001
+</p></dd>
+<dt> &lsquo;<samp>pal</samp>&rsquo;</dt>
+<dd><p>25/1
+</p></dd>
+<dt> &lsquo;<samp>qntsc</samp>&rsquo;</dt>
+<dd><p>30000/1
+</p></dd>
+<dt> &lsquo;<samp>qpal</samp>&rsquo;</dt>
+<dd><p>25/1
+</p></dd>
+<dt> &lsquo;<samp>sntsc</samp>&rsquo;</dt>
+<dd><p>30000/1
+</p></dd>
+<dt> &lsquo;<samp>spal</samp>&rsquo;</dt>
+<dd><p>25/1
+</p></dd>
+<dt> &lsquo;<samp>film</samp>&rsquo;</dt>
+<dd><p>24/1
+</p></dd>
+<dt> &lsquo;<samp>ntsc-film</samp>&rsquo;</dt>
+<dd><p>24000/1
+</p></dd>
+</dl>
+
+<p><a name="ratio-syntax"></a>
+</p><a name="Ratio"></a>
+<h2 class="section"><a href="syntax.html#toc-Ratio">1.6 Ratio</a></h2>
+
+<p>A ratio can be expressed as an expression, or in the form
+<var>numerator</var>:<var>denominator</var>.
+</p>
+<p>Note that a ratio with infinite (1/0) or negative value is
+considered valid, so you should check on the returned value if you
+want to exclude those values.
+</p>
+<p>The undefined value can be expressed using the &quot;0:0&quot; string.
+</p>
+<p><a name="color-syntax"></a>
+</p><a name="Color"></a>
+<h2 class="section"><a href="syntax.html#toc-Color">1.7 Color</a></h2>
+
+<p>It can be the name of a color (case insensitive match) or a
+[0x|#]RRGGBB[AA] sequence, possibly followed by &quot;@&quot; and a string
+representing the alpha component.
+</p>
+<p>The alpha component may be a string composed by &quot;0x&quot; followed by an
+hexadecimal number or a decimal number between 0.0 and 1.0, which
+represents the opacity value (0x00/0.0 means completely transparent,
+0xff/1.0 completely opaque).
+If the alpha component is not specified then 0xff is assumed.
+</p>
+<p>The string &quot;random&quot; will result in a random color.
+</p>
+<footer class="footer pagination-right">
+<span class="label label-info">This document was generated by <em>Kyle Schwarz</em> on <em>October 29, 2012</em> using <a href="http://www.nongnu.org/texi2html/"><em>texi2html 1.82</em></a>.</span></footer></div>

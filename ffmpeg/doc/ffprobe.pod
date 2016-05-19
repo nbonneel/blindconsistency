@@ -1,0 +1,5492 @@
+=head1 NAME
+
+ffprobe - ffprobe media prober
+
+=head1 SYNOPSIS
+
+ffprobe [options] [F<input_file>]
+
+=head1 DESCRIPTION
+
+
+ffprobe gathers information from multimedia streams and prints it in
+human- and machine-readable fashion.
+
+For example it can be used to check the format of the container used
+by a multimedia stream and the format and type of each media stream
+contained in it.
+
+If a filename is specified in input, ffprobe will try to open and
+probe the file content. If the file cannot be opened or recognized as
+a multimedia file, a positive exit code is returned.
+
+ffprobe may be employed both as a standalone application or in
+combination with a textual filter, which may perform more
+sophisticated processing, e.g. statistical processing or plotting.
+
+Options are used to list some of the formats supported by ffprobe or
+for specifying which information to display, and for setting how
+ffprobe will show it.
+
+ffprobe output is designed to be easily parsable by a textual filter,
+and consists of one or more sections of a form defined by the selected
+writer, which is specified by the B<print_format> option.
+
+Metadata tags stored in the container or in the streams are recognized
+and printed in the corresponding "FORMAT" or "STREAM" section.
+
+
+=head1 OPTIONS
+
+
+All the numerical options, if not specified otherwise, accept in input
+a string representing a number, which may contain one of the
+International System number postfixes, for example 'K', 'M', 'G'.
+If 'i' is appended after the postfix, powers of 2 are used instead of
+powers of 10. The 'B' postfix multiplies the value for 8, and can be
+appended after another postfix or used alone. This allows using for
+example 'KB', 'MiB', 'G' and 'B' as postfix.
+
+Options which do not take arguments are boolean options, and set the
+corresponding value to true. They can be set to false by prefixing
+with "no" the option name, for example using "-nofoo" in the
+command line will set to false the boolean option with name "foo".
+
+
+
+=head2 Stream specifiers
+
+Some options are applied per-stream, e.g. bitrate or codec. Stream specifiers
+are used to precisely specify which stream(s) does a given option belong to.
+
+A stream specifier is a string generally appended to the option name and
+separated from it by a colon. E.g. C<-codec:a:1 ac3> option contains
+C<a:1> stream specifier, which matches the second audio stream. Therefore it
+would select the ac3 codec for the second audio stream.
+
+A stream specifier can match several streams, the option is then applied to all
+of them. E.g. the stream specifier in C<-b:a 128k> matches all audio
+streams.
+
+An empty stream specifier matches all streams, for example C<-codec copy>
+or C<-codec: copy> would copy all the streams without reencoding.
+
+Possible forms of stream specifiers are:
+
+=over 4
+
+
+=item I<stream_index>
+
+Matches the stream with this index. E.g. C<-threads:1 4> would set the
+thread count for the second stream to 4.
+
+=item I<stream_type>B<[:>I<stream_index>B<]>
+
+I<stream_type> is one of: 'v' for video, 'a' for audio, 's' for subtitle,
+'d' for data and 't' for attachments. If I<stream_index> is given, then
+matches stream number I<stream_index> of this type. Otherwise matches all
+streams of this type.
+
+=item B<p:>I<program_id>B<[:>I<stream_index>B<]>
+
+If I<stream_index> is given, then matches stream number I<stream_index> in
+program with id I<program_id>. Otherwise matches all streams in this program.
+
+=item B<#>I<stream_id>
+
+Matches the stream by format-specific ID.
+
+=back
+
+
+
+=head2 Generic options
+
+
+These options are shared amongst the av* tools.
+
+
+=over 4
+
+
+
+=item B<-L>
+
+Show license.
+
+
+=item B<-h, -?, -help, --help [>I<arg>B<]>
+
+Show help. An optional parameter may be specified to print help about a specific
+item.
+
+Possible values of I<arg> are:
+
+=over 4
+
+
+=item B<decoder=>I<decoder_name>
+
+Print detailed information about the decoder named I<decoder_name>. Use the
+B<-decoders> option to get a list of all decoders.
+
+
+=item B<encoder=>I<encoder_name>
+
+Print detailed information about the encoder named I<encoder_name>. Use the
+B<-encoders> option to get a list of all encoders.
+
+
+=item B<demuxer=>I<demuxer_name>
+
+Print detailed information about the demuxer named I<demuxer_name>. Use the
+B<-formats> option to get a list of all demuxers and muxers.
+
+
+=item B<muxer=>I<muxer_name>
+
+Print detailed information about the muxer named I<muxer_name>. Use the
+B<-formats> option to get a list of all muxers and demuxers.
+
+
+=back
+
+
+
+=item B<-version>
+
+Show version.
+
+
+=item B<-formats>
+
+Show available formats.
+
+The fields preceding the format names have the following meanings:
+
+=over 4
+
+
+=item B<D>
+
+Decoding available
+
+=item B<E>
+
+Encoding available
+
+=back
+
+
+
+=item B<-codecs>
+
+Show all codecs known to libavcodec.
+
+Note that the term 'codec' is used throughout this documentation as a shortcut
+for what is more correctly called a media bitstream format.
+
+
+=item B<-decoders>
+
+Show available decoders.
+
+
+=item B<-encoders>
+
+Show all available encoders.
+
+
+=item B<-bsfs>
+
+Show available bitstream filters.
+
+
+=item B<-protocols>
+
+Show available protocols.
+
+
+=item B<-filters>
+
+Show available libavfilter filters.
+
+
+=item B<-pix_fmts>
+
+Show available pixel formats.
+
+
+=item B<-sample_fmts>
+
+Show available sample formats.
+
+
+=item B<-layouts>
+
+Show channel names and standard channel layouts.
+
+
+=item B<-loglevel> I<loglevel> B<| -v> I<loglevel>
+
+Set the logging level used by the library.
+I<loglevel> is a number or a string containing one of the following values:
+
+=over 4
+
+
+=item B<quiet>
+
+
+=item B<panic>
+
+
+=item B<fatal>
+
+
+=item B<error>
+
+
+=item B<warning>
+
+
+=item B<info>
+
+
+=item B<verbose>
+
+
+=item B<debug>
+
+
+=back
+
+
+By default the program logs to stderr, if coloring is supported by the
+terminal, colors are used to mark errors and warnings. Log coloring
+can be disabled setting the environment variable
+B<AV_LOG_FORCE_NOCOLOR> or B<NO_COLOR>, or can be forced setting
+the environment variable B<AV_LOG_FORCE_COLOR>.
+The use of the environment variable B<NO_COLOR> is deprecated and
+will be dropped in a following FFmpeg version.
+
+
+=item B<-report>
+
+Dump full command line and console output to a file named
+C<I<program>-I<YYYYMMDD>-I<HHMMSS>.log> in the current
+directory.
+This file can be useful for bug reports.
+It also implies C<-loglevel verbose>.
+
+Note: setting the environment variable C<FFREPORT> to any value has the
+same effect.
+
+
+=item B<-cpuflags flags (>I<global>B<)>
+
+Allows setting and clearing cpu flags. This option is intended
+for testing. Do not use it unless you know what you're doing.
+	
+	ffmpeg -cpuflags -sse+mmx ...
+	ffmpeg -cpuflags mmx ...
+	ffmpeg -cpuflags 0 ...
+
+
+
+=back
+
+
+
+=head2 AVOptions
+
+
+These options are provided directly by the libavformat, libavdevice and
+libavcodec libraries. To see the list of available AVOptions, use the
+B<-help> option. They are separated into two categories:
+
+=over 4
+
+
+=item B<generic>
+
+These options can be set for any container, codec or device. Generic options
+are listed under AVFormatContext options for containers/devices and under
+AVCodecContext options for codecs.
+
+=item B<private>
+
+These options are specific to the given container, device or codec. Private
+options are listed under their corresponding containers/devices/codecs.
+
+=back
+
+
+For example to write an ID3v2.3 header instead of a default ID3v2.4 to
+an MP3 file, use the B<id3v2_version> private option of the MP3
+muxer:
+	
+	ffmpeg -i input.flac -id3v2_version 3 out.mp3
+
+
+All codec AVOptions are obviously per-stream, so the chapter on stream
+specifiers applies to them
+
+Note B<-nooption> syntax cannot be used for boolean AVOptions,
+use B<-option 0>/B<-option 1>.
+
+Note2 old undocumented way of specifying per-stream AVOptions by prepending
+v/a/s to the options name is now obsolete and will be removed soon.
+
+
+
+=head2 Codec AVOptions
+
+
+=over 4
+
+
+=item B<-b[:stream_specifier]> I<integer> B<(>I<output,audio,video>B<)>
+
+set bitrate (in bits/s)
+
+=item B<-ab[:stream_specifier]> I<integer> B<(>I<output,audio>B<)>
+
+set bitrate (in bits/s)
+
+=item B<-bt[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+Set video bitrate tolerance (in bits/s). In 1-pass mode, bitrate tolerance specifies how far ratecontrol is willing to deviate from the target average bitrate value. This is not related to min/max bitrate. Lowering tolerance too much has an adverse effect on quality.
+
+=item B<-flags[:stream_specifier]> I<flags> B<(>I<input/output,audio,video,subtitles>B<)>
+
+
+Possible values:
+
+=over 4
+
+
+=item B<mv4>
+
+use four motion vector by macroblock (mpeg4)
+
+=item B<qpel>
+
+use 1/4 pel motion compensation
+
+=item B<loop>
+
+use loop filter
+
+=item B<qscale>
+
+use fixed qscale
+
+=item B<gmc>
+
+use gmc
+
+=item B<mv0>
+
+always try a mb with mv=E<lt>0,0E<gt>
+
+=item B<input_preserved>
+
+
+
+=item B<pass1>
+
+use internal 2pass ratecontrol in first  pass mode
+
+=item B<pass2>
+
+use internal 2pass ratecontrol in second pass mode
+
+=item B<gray>
+
+only decode/encode grayscale
+
+=item B<emu_edge>
+
+don't draw edges
+
+=item B<psnr>
+
+error[?] variables will be set during encoding
+
+=item B<truncated>
+
+
+
+=item B<naq>
+
+normalize adaptive quantization
+
+=item B<ildct>
+
+use interlaced dct
+
+=item B<low_delay>
+
+force low delay
+
+=item B<global_header>
+
+place global headers in extradata instead of every keyframe
+
+=item B<bitexact>
+
+use only bitexact stuff (except (i)dct)
+
+=item B<aic>
+
+h263 advanced intra coding / mpeg4 ac prediction
+
+=item B<cbp>
+
+Deprecated, use mpegvideo private options instead
+
+=item B<qprd>
+
+Deprecated, use mpegvideo private options instead
+
+=item B<ilme>
+
+interlaced motion estimation
+
+=item B<cgop>
+
+closed gop
+
+=back
+
+
+=item B<-sub_id[:stream_specifier]> I<integer> B<()>
+
+
+=item B<-me_method[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+set motion estimation method
+
+Possible values:
+
+=over 4
+
+
+=item B<zero>
+
+zero motion estimation (fastest)
+
+=item B<full>
+
+full motion estimation (slowest)
+
+=item B<epzs>
+
+EPZS motion estimation (default)
+
+=item B<esa>
+
+esa motion estimation (alias for full)
+
+=item B<tesa>
+
+tesa motion estimation
+
+=item B<dia>
+
+dia motion estimation (alias for epzs)
+
+=item B<log>
+
+log motion estimation
+
+=item B<phods>
+
+phods motion estimation
+
+=item B<x1>
+
+X1 motion estimation
+
+=item B<hex>
+
+hex motion estimation
+
+=item B<umh>
+
+umh motion estimation
+
+=item B<iter>
+
+iter motion estimation
+
+=back
+
+
+=item B<-extradata_size[:stream_specifier]> I<integer> B<()>
+
+
+=item B<-time_base[:stream_specifier]> I<rational number> B<()>
+
+
+=item B<-g[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+set the group of picture size
+
+=item B<-ar[:stream_specifier]> I<integer> B<(>I<input/output,audio>B<)>
+
+set audio sampling rate (in Hz)
+
+=item B<-ac[:stream_specifier]> I<integer> B<(>I<input/output,audio>B<)>
+
+set number of audio channels
+
+=item B<-cutoff[:stream_specifier]> I<integer> B<(>I<output,audio>B<)>
+
+set cutoff bandwidth
+
+=item B<-frame_size[:stream_specifier]> I<integer> B<(>I<output,audio>B<)>
+
+
+=item B<-frame_number[:stream_specifier]> I<integer> B<()>
+
+
+=item B<-delay[:stream_specifier]> I<integer> B<()>
+
+
+=item B<-qcomp[:stream_specifier]> I<float> B<(>I<output,video>B<)>
+
+video quantizer scale compression (VBR). Constant of ratecontrol equation. Recommended range for default rc_eq: 0.0-1.0
+
+=item B<-qblur[:stream_specifier]> I<float> B<(>I<output,video>B<)>
+
+video quantizer scale blur (VBR)
+
+=item B<-qmin[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+min video quantizer scale (VBR)
+
+=item B<-qmax[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+max video quantizer scale (VBR)
+
+=item B<-qdiff[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+max difference between the quantizer scale (VBR)
+
+=item B<-bf[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+use 'frames' B frames
+
+=item B<-b_qfactor[:stream_specifier]> I<float> B<(>I<output,video>B<)>
+
+qp factor between p and b frames
+
+=item B<-rc_strategy[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+ratecontrol method
+
+=item B<-b_strategy[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+strategy to choose between I/P/B-frames
+
+=item B<-ps[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+rtp payload size in bytes
+
+=item B<-mv_bits[:stream_specifier]> I<integer> B<()>
+
+
+=item B<-header_bits[:stream_specifier]> I<integer> B<()>
+
+
+=item B<-i_tex_bits[:stream_specifier]> I<integer> B<()>
+
+
+=item B<-p_tex_bits[:stream_specifier]> I<integer> B<()>
+
+
+=item B<-i_count[:stream_specifier]> I<integer> B<()>
+
+
+=item B<-p_count[:stream_specifier]> I<integer> B<()>
+
+
+=item B<-skip_count[:stream_specifier]> I<integer> B<()>
+
+
+=item B<-misc_bits[:stream_specifier]> I<integer> B<()>
+
+
+=item B<-frame_bits[:stream_specifier]> I<integer> B<()>
+
+
+=item B<-codec_tag[:stream_specifier]> I<integer> B<()>
+
+
+=item B<-bug[:stream_specifier]> I<flags> B<(>I<input,video>B<)>
+
+workaround not auto detected encoder bugs
+
+Possible values:
+
+=over 4
+
+
+=item B<autodetect>
+
+
+
+=item B<old_msmpeg4>
+
+some old lavc generated msmpeg4v3 files (no autodetection)
+
+=item B<xvid_ilace>
+
+Xvid interlacing bug (autodetected if fourcc==XVIX)
+
+=item B<ump4>
+
+(autodetected if fourcc==UMP4)
+
+=item B<no_padding>
+
+padding bug (autodetected)
+
+=item B<amv>
+
+
+
+=item B<ac_vlc>
+
+illegal vlc bug (autodetected per fourcc)
+
+=item B<qpel_chroma>
+
+
+
+=item B<std_qpel>
+
+old standard qpel (autodetected per fourcc/version)
+
+=item B<qpel_chroma2>
+
+
+
+=item B<direct_blocksize>
+
+direct-qpel-blocksize bug (autodetected per fourcc/version)
+
+=item B<edge>
+
+edge padding bug (autodetected per fourcc/version)
+
+=item B<hpel_chroma>
+
+
+
+=item B<dc_clip>
+
+
+
+=item B<ms>
+
+workaround various bugs in microsofts broken decoders
+
+=item B<trunc>
+
+trancated frames
+
+=back
+
+
+=item B<-lelim[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+single coefficient elimination threshold for luminance (negative values also consider dc coefficient)
+
+=item B<-celim[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+single coefficient elimination threshold for chrominance (negative values also consider dc coefficient)
+
+=item B<-strict[:stream_specifier]> I<integer> B<(>I<input/output,audio,video>B<)>
+
+how strictly to follow the standards
+
+Possible values:
+
+=over 4
+
+
+=item B<very>
+
+strictly conform to a older more strict version of the spec or reference software
+
+=item B<strict>
+
+strictly conform to all the things in the spec no matter what consequences
+
+=item B<normal>
+
+
+
+=item B<unofficial>
+
+allow unofficial extensions
+
+=item B<experimental>
+
+allow non standardized experimental things
+
+=back
+
+
+=item B<-b_qoffset[:stream_specifier]> I<float> B<(>I<output,video>B<)>
+
+qp offset between P and B frames
+
+=item B<-err_detect[:stream_specifier]> I<flags> B<(>I<input,audio,video>B<)>
+
+set error detection flags
+
+Possible values:
+
+=over 4
+
+
+=item B<crccheck>
+
+verify embedded CRCs
+
+=item B<bitstream>
+
+detect bitstream specification deviations
+
+=item B<buffer>
+
+detect improper bitstream length
+
+=item B<explode>
+
+abort decoding on minor error detection
+
+=item B<careful>
+
+consider things that violate the spec and have not been seen in the wild as errors
+
+=item B<compliant>
+
+consider all spec non compliancies as errors
+
+=item B<aggressive>
+
+consider things that a sane encoder should not do as an error
+
+=back
+
+
+=item B<-has_b_frames[:stream_specifier]> I<integer> B<()>
+
+
+=item B<-block_align[:stream_specifier]> I<integer> B<()>
+
+
+=item B<-mpeg_quant[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+use MPEG quantizers instead of H.263
+
+=item B<-qsquish[:stream_specifier]> I<float> B<(>I<output,video>B<)>
+
+how to keep quantizer between qmin and qmax (0 = clip, 1 = use differentiable function)
+
+=item B<-rc_qmod_amp[:stream_specifier]> I<float> B<(>I<output,video>B<)>
+
+experimental quantizer modulation
+
+=item B<-rc_qmod_freq[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+experimental quantizer modulation
+
+=item B<-rc_override_count[:stream_specifier]> I<integer> B<()>
+
+
+=item B<-rc_eq[:stream_specifier]> I<string> B<(>I<output,video>B<)>
+
+Set rate control equation. When computing the expression, besides the standard functions defined in the section 'Expression Evaluation', the following functions are available: bits2qp(bits), qp2bits(qp). Also the following constants are available: iTex pTex tex mv fCode iCount mcVar var isI isP isB avgQP qComp avgIITex avgPITex avgPPTex avgBPTex avgTex.
+
+=item B<-maxrate[:stream_specifier]> I<integer> B<(>I<output,audio,video>B<)>
+
+Set max bitrate tolerance (in bits/s). Requires bufsize to be set.
+
+=item B<-minrate[:stream_specifier]> I<integer> B<(>I<output,audio,video>B<)>
+
+Set min bitrate tolerance (in bits/s). Most useful in setting up a CBR encode. It is of little use elsewise.
+
+=item B<-bufsize[:stream_specifier]> I<integer> B<(>I<output,audio,video>B<)>
+
+set ratecontrol buffer size (in bits)
+
+=item B<-rc_buf_aggressivity[:stream_specifier]> I<float> B<(>I<output,video>B<)>
+
+currently useless
+
+=item B<-i_qfactor[:stream_specifier]> I<float> B<(>I<output,video>B<)>
+
+qp factor between P and I frames
+
+=item B<-i_qoffset[:stream_specifier]> I<float> B<(>I<output,video>B<)>
+
+qp offset between P and I frames
+
+=item B<-rc_init_cplx[:stream_specifier]> I<float> B<(>I<output,video>B<)>
+
+initial complexity for 1-pass encoding
+
+=item B<-dct[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+DCT algorithm
+
+Possible values:
+
+=over 4
+
+
+=item B<auto>
+
+autoselect a good one (default)
+
+=item B<fastint>
+
+fast integer
+
+=item B<int>
+
+accurate integer
+
+=item B<mmx>
+
+
+
+=item B<altivec>
+
+
+
+=item B<faan>
+
+floating point AAN DCT
+
+=back
+
+
+=item B<-lumi_mask[:stream_specifier]> I<float> B<(>I<output,video>B<)>
+
+compresses bright areas stronger than medium ones
+
+=item B<-tcplx_mask[:stream_specifier]> I<float> B<(>I<output,video>B<)>
+
+temporal complexity masking
+
+=item B<-scplx_mask[:stream_specifier]> I<float> B<(>I<output,video>B<)>
+
+spatial complexity masking
+
+=item B<-p_mask[:stream_specifier]> I<float> B<(>I<output,video>B<)>
+
+inter masking
+
+=item B<-dark_mask[:stream_specifier]> I<float> B<(>I<output,video>B<)>
+
+compresses dark areas stronger than medium ones
+
+=item B<-idct[:stream_specifier]> I<integer> B<(>I<input/output,video>B<)>
+
+select IDCT implementation
+
+Possible values:
+
+=over 4
+
+
+=item B<auto>
+
+
+
+=item B<int>
+
+
+
+=item B<simple>
+
+
+
+=item B<simplemmx>
+
+
+
+=item B<libmpeg2mmx>
+
+
+
+=item B<mmi>
+
+
+
+=item B<arm>
+
+
+
+=item B<altivec>
+
+
+
+=item B<sh4>
+
+
+
+=item B<simplearm>
+
+
+
+=item B<simplearmv5te>
+
+
+
+=item B<simplearmv6>
+
+
+
+=item B<simpleneon>
+
+
+
+=item B<simplealpha>
+
+
+
+=item B<h264>
+
+
+
+=item B<vp3>
+
+
+
+=item B<ipp>
+
+
+
+=item B<xvidmmx>
+
+
+
+=item B<faani>
+
+floating point AAN IDCT
+
+=back
+
+
+=item B<-slice_count[:stream_specifier]> I<integer> B<()>
+
+
+=item B<-ec[:stream_specifier]> I<flags> B<(>I<input,video>B<)>
+
+set error concealment strategy
+
+Possible values:
+
+=over 4
+
+
+=item B<guess_mvs>
+
+iterative motion vector (MV) search (slow)
+
+=item B<deblock>
+
+use strong deblock filter for damaged MBs
+
+=back
+
+
+=item B<-bits_per_coded_sample[:stream_specifier]> I<integer> B<()>
+
+
+=item B<-pred[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+prediction method
+
+Possible values:
+
+=over 4
+
+
+=item B<left>
+
+
+
+=item B<plane>
+
+
+
+=item B<median>
+
+
+
+=back
+
+
+=item B<-aspect[:stream_specifier]> I<rational number> B<(>I<output,video>B<)>
+
+sample aspect ratio
+
+=item B<-debug[:stream_specifier]> I<flags> B<(>I<input/output,audio,video,subtitles>B<)>
+
+print specific debug info
+
+Possible values:
+
+=over 4
+
+
+=item B<pict>
+
+picture info
+
+=item B<rc>
+
+rate control
+
+=item B<bitstream>
+
+
+
+=item B<mb_type>
+
+macroblock (MB) type
+
+=item B<qp>
+
+per-block quantization parameter (QP)
+
+=item B<mv>
+
+motion vector
+
+=item B<dct_coeff>
+
+
+
+=item B<skip>
+
+
+
+=item B<startcode>
+
+
+
+=item B<pts>
+
+
+
+=item B<er>
+
+error recognition
+
+=item B<mmco>
+
+memory management control operations (H.264)
+
+=item B<bugs>
+
+
+
+=item B<vis_qp>
+
+visualize quantization parameter (QP), lower QP are tinted greener
+
+=item B<vis_mb_type>
+
+visualize block types
+
+=item B<buffers>
+
+picture buffer allocations
+
+=item B<thread_ops>
+
+threading operations
+
+=back
+
+
+=item B<-vismv[:stream_specifier]> I<integer> B<(>I<input,video>B<)>
+
+visualize motion vectors (MVs)
+
+Possible values:
+
+=over 4
+
+
+=item B<pf>
+
+forward predicted MVs of P-frames
+
+=item B<bf>
+
+forward predicted MVs of B-frames
+
+=item B<bb>
+
+backward predicted MVs of B-frames
+
+=back
+
+
+=item B<-cmp[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+full pel me compare function
+
+Possible values:
+
+=over 4
+
+
+=item B<sad>
+
+sum of absolute differences, fast (default)
+
+=item B<sse>
+
+sum of squared errors
+
+=item B<satd>
+
+sum of absolute Hadamard transformed differences
+
+=item B<dct>
+
+sum of absolute DCT transformed differences
+
+=item B<psnr>
+
+sum of squared quantization errors (avoid, low quality)
+
+=item B<bit>
+
+number of bits needed for the block
+
+=item B<rd>
+
+rate distortion optimal, slow
+
+=item B<zero>
+
+0
+
+=item B<vsad>
+
+sum of absolute vertical differences
+
+=item B<vsse>
+
+sum of squared vertical differences
+
+=item B<nsse>
+
+noise preserving sum of squared differences
+
+=item B<w53>
+
+5/3 wavelet, only used in snow
+
+=item B<w97>
+
+9/7 wavelet, only used in snow
+
+=item B<dctmax>
+
+
+
+=item B<chroma>
+
+
+
+=back
+
+
+=item B<-subcmp[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+sub pel me compare function
+
+Possible values:
+
+=over 4
+
+
+=item B<sad>
+
+sum of absolute differences, fast (default)
+
+=item B<sse>
+
+sum of squared errors
+
+=item B<satd>
+
+sum of absolute Hadamard transformed differences
+
+=item B<dct>
+
+sum of absolute DCT transformed differences
+
+=item B<psnr>
+
+sum of squared quantization errors (avoid, low quality)
+
+=item B<bit>
+
+number of bits needed for the block
+
+=item B<rd>
+
+rate distortion optimal, slow
+
+=item B<zero>
+
+0
+
+=item B<vsad>
+
+sum of absolute vertical differences
+
+=item B<vsse>
+
+sum of squared vertical differences
+
+=item B<nsse>
+
+noise preserving sum of squared differences
+
+=item B<w53>
+
+5/3 wavelet, only used in snow
+
+=item B<w97>
+
+9/7 wavelet, only used in snow
+
+=item B<dctmax>
+
+
+
+=item B<chroma>
+
+
+
+=back
+
+
+=item B<-mbcmp[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+macroblock compare function
+
+Possible values:
+
+=over 4
+
+
+=item B<sad>
+
+sum of absolute differences, fast (default)
+
+=item B<sse>
+
+sum of squared errors
+
+=item B<satd>
+
+sum of absolute Hadamard transformed differences
+
+=item B<dct>
+
+sum of absolute DCT transformed differences
+
+=item B<psnr>
+
+sum of squared quantization errors (avoid, low quality)
+
+=item B<bit>
+
+number of bits needed for the block
+
+=item B<rd>
+
+rate distortion optimal, slow
+
+=item B<zero>
+
+0
+
+=item B<vsad>
+
+sum of absolute vertical differences
+
+=item B<vsse>
+
+sum of squared vertical differences
+
+=item B<nsse>
+
+noise preserving sum of squared differences
+
+=item B<w53>
+
+5/3 wavelet, only used in snow
+
+=item B<w97>
+
+9/7 wavelet, only used in snow
+
+=item B<dctmax>
+
+
+
+=item B<chroma>
+
+
+
+=back
+
+
+=item B<-ildctcmp[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+interlaced dct compare function
+
+Possible values:
+
+=over 4
+
+
+=item B<sad>
+
+sum of absolute differences, fast (default)
+
+=item B<sse>
+
+sum of squared errors
+
+=item B<satd>
+
+sum of absolute Hadamard transformed differences
+
+=item B<dct>
+
+sum of absolute DCT transformed differences
+
+=item B<psnr>
+
+sum of squared quantization errors (avoid, low quality)
+
+=item B<bit>
+
+number of bits needed for the block
+
+=item B<rd>
+
+rate distortion optimal, slow
+
+=item B<zero>
+
+0
+
+=item B<vsad>
+
+sum of absolute vertical differences
+
+=item B<vsse>
+
+sum of squared vertical differences
+
+=item B<nsse>
+
+noise preserving sum of squared differences
+
+=item B<w53>
+
+5/3 wavelet, only used in snow
+
+=item B<w97>
+
+9/7 wavelet, only used in snow
+
+=item B<dctmax>
+
+
+
+=item B<chroma>
+
+
+
+=back
+
+
+=item B<-dia_size[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+diamond type & size for motion estimation
+
+=item B<-last_pred[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+amount of motion predictors from the previous frame
+
+=item B<-preme[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+pre motion estimation
+
+=item B<-precmp[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+pre motion estimation compare function
+
+Possible values:
+
+=over 4
+
+
+=item B<sad>
+
+sum of absolute differences, fast (default)
+
+=item B<sse>
+
+sum of squared errors
+
+=item B<satd>
+
+sum of absolute Hadamard transformed differences
+
+=item B<dct>
+
+sum of absolute DCT transformed differences
+
+=item B<psnr>
+
+sum of squared quantization errors (avoid, low quality)
+
+=item B<bit>
+
+number of bits needed for the block
+
+=item B<rd>
+
+rate distortion optimal, slow
+
+=item B<zero>
+
+0
+
+=item B<vsad>
+
+sum of absolute vertical differences
+
+=item B<vsse>
+
+sum of squared vertical differences
+
+=item B<nsse>
+
+noise preserving sum of squared differences
+
+=item B<w53>
+
+5/3 wavelet, only used in snow
+
+=item B<w97>
+
+9/7 wavelet, only used in snow
+
+=item B<dctmax>
+
+
+
+=item B<chroma>
+
+
+
+=back
+
+
+=item B<-pre_dia_size[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+diamond type & size for motion estimation pre-pass
+
+=item B<-subq[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+sub pel motion estimation quality
+
+=item B<-dtg_active_format[:stream_specifier]> I<integer> B<()>
+
+
+=item B<-me_range[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+limit motion vectors range (1023 for DivX player)
+
+=item B<-ibias[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+intra quant bias
+
+=item B<-pbias[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+inter quant bias
+
+=item B<-color_table_id[:stream_specifier]> I<integer> B<()>
+
+
+=item B<-global_quality[:stream_specifier]> I<integer> B<(>I<output,audio,video>B<)>
+
+
+=item B<-coder[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+
+Possible values:
+
+=over 4
+
+
+=item B<vlc>
+
+variable length coder / huffman coder
+
+=item B<ac>
+
+arithmetic coder
+
+=item B<raw>
+
+raw (no encoding)
+
+=item B<rle>
+
+run-length coder
+
+=item B<deflate>
+
+deflate-based coder
+
+=back
+
+
+=item B<-context[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+context model
+
+=item B<-slice_flags[:stream_specifier]> I<integer> B<()>
+
+
+=item B<-xvmc_acceleration[:stream_specifier]> I<integer> B<()>
+
+
+=item B<-mbd[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+macroblock decision algorithm (high quality mode)
+
+Possible values:
+
+=over 4
+
+
+=item B<simple>
+
+use mbcmp (default)
+
+=item B<bits>
+
+use fewest bits
+
+=item B<rd>
+
+use best rate distortion
+
+=back
+
+
+=item B<-stream_codec_tag[:stream_specifier]> I<integer> B<()>
+
+
+=item B<-sc_threshold[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+scene change threshold
+
+=item B<-lmin[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+min lagrange factor (VBR)
+
+=item B<-lmax[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+max lagrange factor (VBR)
+
+=item B<-nr[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+noise reduction
+
+=item B<-rc_init_occupancy[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+number of bits which should be loaded into the rc buffer before decoding starts
+
+=item B<-inter_threshold[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+
+=item B<-flags2[:stream_specifier]> I<flags> B<(>I<input/output,audio,video>B<)>
+
+
+Possible values:
+
+=over 4
+
+
+=item B<fast>
+
+allow non spec compliant speedup tricks
+
+=item B<sgop>
+
+Deprecated, use mpegvideo private options instead
+
+=item B<noout>
+
+skip bitstream encoding
+
+=item B<local_header>
+
+place global headers at every keyframe instead of in extradata
+
+=item B<chunks>
+
+Frame data might be split into multiple chunks
+
+=item B<showall>
+
+Show all frames before the first keyframe
+
+=item B<skiprd>
+
+Deprecated, use mpegvideo private options instead
+
+=back
+
+
+=item B<-error[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+
+=item B<-qns[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+deprecated, use mpegvideo private options instead
+
+=item B<-threads[:stream_specifier]> I<integer> B<(>I<input/output,video>B<)>
+
+
+Possible values:
+
+=over 4
+
+
+=item B<auto>
+
+detect a good number of threads
+
+=back
+
+
+=item B<-me_threshold[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+motion estimaton threshold
+
+=item B<-mb_threshold[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+macroblock threshold
+
+=item B<-dc[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+intra_dc_precision
+
+=item B<-nssew[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+nsse weight
+
+=item B<-skip_top[:stream_specifier]> I<integer> B<(>I<input,video>B<)>
+
+number of macroblock rows at the top which are skipped
+
+=item B<-skip_bottom[:stream_specifier]> I<integer> B<(>I<input,video>B<)>
+
+number of macroblock rows at the bottom which are skipped
+
+=item B<-profile[:stream_specifier]> I<integer> B<(>I<output,audio,video>B<)>
+
+
+Possible values:
+
+=over 4
+
+
+=item B<unknown>
+
+
+
+=item B<aac_main>
+
+
+
+=item B<aac_low>
+
+
+
+=item B<aac_ssr>
+
+
+
+=item B<aac_ltp>
+
+
+
+=item B<aac_he>
+
+
+
+=item B<aac_he_v2>
+
+
+
+=item B<aac_ld>
+
+
+
+=item B<aac_eld>
+
+
+
+=item B<dts>
+
+
+
+=item B<dts_es>
+
+
+
+=item B<dts_96_24>
+
+
+
+=item B<dts_hd_hra>
+
+
+
+=item B<dts_hd_ma>
+
+
+
+=back
+
+
+=item B<-level[:stream_specifier]> I<integer> B<(>I<output,audio,video>B<)>
+
+
+Possible values:
+
+=over 4
+
+
+=item B<unknown>
+
+
+
+=back
+
+
+=item B<-lowres[:stream_specifier]> I<integer> B<(>I<input,audio,video>B<)>
+
+decode at 1= 1/2, 2=1/4, 3=1/8 resolutions
+
+=item B<-skip_threshold[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+frame skip threshold
+
+=item B<-skip_factor[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+frame skip factor
+
+=item B<-skip_exp[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+frame skip exponent
+
+=item B<-skipcmp[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+frame skip compare function
+
+Possible values:
+
+=over 4
+
+
+=item B<sad>
+
+sum of absolute differences, fast (default)
+
+=item B<sse>
+
+sum of squared errors
+
+=item B<satd>
+
+sum of absolute Hadamard transformed differences
+
+=item B<dct>
+
+sum of absolute DCT transformed differences
+
+=item B<psnr>
+
+sum of squared quantization errors (avoid, low quality)
+
+=item B<bit>
+
+number of bits needed for the block
+
+=item B<rd>
+
+rate distortion optimal, slow
+
+=item B<zero>
+
+0
+
+=item B<vsad>
+
+sum of absolute vertical differences
+
+=item B<vsse>
+
+sum of squared vertical differences
+
+=item B<nsse>
+
+noise preserving sum of squared differences
+
+=item B<w53>
+
+5/3 wavelet, only used in snow
+
+=item B<w97>
+
+9/7 wavelet, only used in snow
+
+=item B<dctmax>
+
+
+
+=item B<chroma>
+
+
+
+=back
+
+
+=item B<-border_mask[:stream_specifier]> I<float> B<(>I<output,video>B<)>
+
+increases the quantizer for macroblocks close to borders
+
+=item B<-mblmin[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+min macroblock lagrange factor (VBR)
+
+=item B<-mblmax[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+max macroblock lagrange factor (VBR)
+
+=item B<-mepc[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+motion estimation bitrate penalty compensation (1.0 = 256)
+
+=item B<-skip_loop_filter[:stream_specifier]> I<integer> B<(>I<input,video>B<)>
+
+
+Possible values:
+
+=over 4
+
+
+=item B<none>
+
+
+
+=item B<default>
+
+
+
+=item B<noref>
+
+
+
+=item B<bidir>
+
+
+
+=item B<nokey>
+
+
+
+=item B<all>
+
+
+
+=back
+
+
+=item B<-skip_idct[:stream_specifier]> I<integer> B<(>I<input,video>B<)>
+
+
+Possible values:
+
+=over 4
+
+
+=item B<none>
+
+
+
+=item B<default>
+
+
+
+=item B<noref>
+
+
+
+=item B<bidir>
+
+
+
+=item B<nokey>
+
+
+
+=item B<all>
+
+
+
+=back
+
+
+=item B<-skip_frame[:stream_specifier]> I<integer> B<(>I<input,video>B<)>
+
+
+Possible values:
+
+=over 4
+
+
+=item B<none>
+
+
+
+=item B<default>
+
+
+
+=item B<noref>
+
+
+
+=item B<bidir>
+
+
+
+=item B<nokey>
+
+
+
+=item B<all>
+
+
+
+=back
+
+
+=item B<-bidir_refine[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+refine the two motion vectors used in bidirectional macroblocks
+
+=item B<-brd_scale[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+downscales frames for dynamic B-frame decision
+
+=item B<-keyint_min[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+minimum interval between IDR-frames
+
+=item B<-refs[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+reference frames to consider for motion compensation
+
+=item B<-chromaoffset[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+chroma qp offset from luma
+
+=item B<-trellis[:stream_specifier]> I<integer> B<(>I<output,audio,video>B<)>
+
+rate-distortion optimal quantization
+
+=item B<-sc_factor[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+multiplied by qscale for each frame and added to scene_change_score
+
+=item B<-mv0_threshold[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+
+=item B<-b_sensitivity[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+adjusts sensitivity of b_frame_strategy 1
+
+=item B<-compression_level[:stream_specifier]> I<integer> B<(>I<output,audio,video>B<)>
+
+
+=item B<-min_prediction_order[:stream_specifier]> I<integer> B<(>I<output,audio>B<)>
+
+
+=item B<-max_prediction_order[:stream_specifier]> I<integer> B<(>I<output,audio>B<)>
+
+
+=item B<-timecode_frame_start[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+GOP timecode frame start number, in non drop frame format
+
+=item B<-request_channels[:stream_specifier]> I<integer> B<(>I<input,audio>B<)>
+
+set desired number of audio channels
+
+=item B<-bits_per_raw_sample[:stream_specifier]> I<integer> B<()>
+
+
+=item B<-channel_layout[:stream_specifier]> I<integer> B<(>I<input/output,audio>B<)>
+
+
+Possible values:
+
+=over 4
+
+
+=back
+
+
+=item B<-request_channel_layout[:stream_specifier]> I<integer> B<(>I<input,audio>B<)>
+
+
+Possible values:
+
+=over 4
+
+
+=back
+
+
+=item B<-rc_max_vbv_use[:stream_specifier]> I<float> B<(>I<output,video>B<)>
+
+
+=item B<-rc_min_vbv_use[:stream_specifier]> I<float> B<(>I<output,video>B<)>
+
+
+=item B<-ticks_per_frame[:stream_specifier]> I<integer> B<(>I<input/output,audio,video>B<)>
+
+
+=item B<-color_primaries[:stream_specifier]> I<integer> B<(>I<input/output,video>B<)>
+
+
+=item B<-color_trc[:stream_specifier]> I<integer> B<(>I<input/output,video>B<)>
+
+
+=item B<-colorspace[:stream_specifier]> I<integer> B<(>I<input/output,video>B<)>
+
+
+=item B<-color_range[:stream_specifier]> I<integer> B<(>I<input/output,video>B<)>
+
+
+=item B<-chroma_sample_location[:stream_specifier]> I<integer> B<(>I<input/output,video>B<)>
+
+
+=item B<-log_level_offset[:stream_specifier]> I<integer> B<()>
+
+set the log level offset
+
+=item B<-slices[:stream_specifier]> I<integer> B<(>I<output,video>B<)>
+
+number of slices, used in parallelized encoding
+
+=item B<-thread_type[:stream_specifier]> I<flags> B<(>I<input/output,video>B<)>
+
+select multithreading type
+
+Possible values:
+
+=over 4
+
+
+=item B<slice>
+
+
+
+=item B<frame>
+
+
+
+=back
+
+
+=item B<-audio_service_type[:stream_specifier]> I<integer> B<(>I<output,audio>B<)>
+
+audio service type
+
+Possible values:
+
+=over 4
+
+
+=item B<ma>
+
+Main Audio Service
+
+=item B<ef>
+
+Effects
+
+=item B<vi>
+
+Visually Impaired
+
+=item B<hi>
+
+Hearing Impaired
+
+=item B<di>
+
+Dialogue
+
+=item B<co>
+
+Commentary
+
+=item B<em>
+
+Emergency
+
+=item B<vo>
+
+Voice Over
+
+=item B<ka>
+
+Karaoke
+
+=back
+
+
+=item B<-request_sample_fmt[:stream_specifier]> I<integer> B<(>I<input,audio>B<)>
+
+sample format audio decoders should prefer
+
+Possible values:
+
+=over 4
+
+
+=item B<u8>
+
+8-bit unsigned integer
+
+=item B<s16>
+
+16-bit signed integer
+
+=item B<s32>
+
+32-bit signed integer
+
+=item B<flt>
+
+32-bit float
+
+=item B<dbl>
+
+64-bit double
+
+=item B<u8p>
+
+8-bit unsigned integer planar
+
+=item B<s16p>
+
+16-bit signed integer planar
+
+=item B<s32p>
+
+32-bit signed integer planar
+
+=item B<fltp>
+
+32-bit float planar
+
+=item B<dblp>
+
+64-bit double planar
+
+=back
+
+
+=item B<-pkt_timebase[:stream_specifier]> I<rational number> B<()>
+
+
+=back
+
+
+
+=head2 Format AVOptions
+
+
+=over 4
+
+
+=item B<-avioflags> I<flags> B<(>I<input/output>B<)>
+
+
+Possible values:
+
+=over 4
+
+
+=item B<direct>
+
+reduce buffering
+
+=back
+
+
+=item B<-probesize> I<integer> B<(>I<input>B<)>
+
+set probing size
+
+=item B<-packetsize> I<integer> B<(>I<output>B<)>
+
+set packet size
+
+=item B<-fflags> I<flags> B<(>I<input/output>B<)>
+
+
+Possible values:
+
+=over 4
+
+
+=item B<ignidx>
+
+ignore index
+
+=item B<genpts>
+
+generate pts
+
+=item B<nofillin>
+
+do not fill in missing values that can be exactly calculated
+
+=item B<noparse>
+
+disable AVParsers, this needs nofillin too
+
+=item B<igndts>
+
+ignore dts
+
+=item B<discardcorrupt>
+
+discard corrupted frames
+
+=item B<sortdts>
+
+try to interleave outputted packets by dts
+
+=item B<keepside>
+
+dont merge side data
+
+=item B<latm>
+
+enable RTP MP4A-LATM payload
+
+=item B<nobuffer>
+
+reduce the latency introduced by optional buffering
+
+=back
+
+
+=item B<-analyzeduration> I<integer> B<(>I<input>B<)>
+
+how many microseconds are analyzed to estimate duration
+
+=item B<-cryptokey> I<hexadecimal string> B<(>I<input>B<)>
+
+decryption key
+
+=item B<-indexmem> I<integer> B<(>I<input>B<)>
+
+max memory used for timestamp index (per stream)
+
+=item B<-rtbufsize> I<integer> B<(>I<input>B<)>
+
+max memory used for buffering real-time frames
+
+=item B<-fdebug> I<flags> B<(>I<input/output>B<)>
+
+print specific debug info
+
+Possible values:
+
+=over 4
+
+
+=item B<ts>
+
+
+
+=back
+
+
+=item B<-max_delay> I<integer> B<(>I<input/output>B<)>
+
+maximum muxing or demuxing delay in microseconds
+
+=item B<-fpsprobesize> I<integer> B<(>I<input>B<)>
+
+number of frames used to probe fps
+
+=item B<-audio_preload> I<integer> B<(>I<output>B<)>
+
+microseconds by which audio packets should be interleaved earlier
+
+=item B<-chunk_duration> I<integer> B<(>I<output>B<)>
+
+microseconds for each chunk
+
+=item B<-chunk_size> I<integer> B<(>I<output>B<)>
+
+size in bytes for each chunk
+
+=item B<-f_err_detect> I<flags> B<(>I<input>B<)>
+
+set error detection flags (deprecated; use err_detect, save via avconv)
+
+Possible values:
+
+=over 4
+
+
+=item B<crccheck>
+
+verify embedded CRCs
+
+=item B<bitstream>
+
+detect bitstream specification deviations
+
+=item B<buffer>
+
+detect improper bitstream length
+
+=item B<explode>
+
+abort decoding on minor error detection
+
+=item B<careful>
+
+consider things that violate the spec and have not been seen in the wild as errors
+
+=item B<compliant>
+
+consider all spec non compliancies as errors
+
+=item B<aggressive>
+
+consider things that a sane encoder shouldnt do as an error
+
+=back
+
+
+=item B<-err_detect> I<flags> B<(>I<input>B<)>
+
+set error detection flags
+
+Possible values:
+
+=over 4
+
+
+=item B<crccheck>
+
+verify embedded CRCs
+
+=item B<bitstream>
+
+detect bitstream specification deviations
+
+=item B<buffer>
+
+detect improper bitstream length
+
+=item B<explode>
+
+abort decoding on minor error detection
+
+=item B<careful>
+
+consider things that violate the spec and have not been seen in the wild as errors
+
+=item B<compliant>
+
+consider all spec non compliancies as errors
+
+=item B<aggressive>
+
+consider things that a sane encoder shouldnt do as an error
+
+=back
+
+
+=item B<-use_wallclock_as_timestamps> I<integer> B<(>I<input>B<)>
+
+use wallclock as timestamps
+
+=item B<-avoid_negative_ts> I<integer> B<(>I<output>B<)>
+
+avoid negative timestamps
+
+=back
+
+
+
+=head2 Main options
+
+
+
+=over 4
+
+
+
+=item B<-f> I<format>
+
+Force format to use.
+
+
+=item B<-unit>
+
+Show the unit of the displayed values.
+
+
+=item B<-prefix>
+
+Use SI prefixes for the displayed values.
+Unless the "-byte_binary_prefix" option is used all the prefixes
+are decimal.
+
+
+=item B<-byte_binary_prefix>
+
+Force the use of binary prefixes for byte values.
+
+
+=item B<-sexagesimal>
+
+Use sexagesimal format HH:MM:SS.MICROSECONDS for time values.
+
+
+=item B<-pretty>
+
+Prettify the format of the displayed values, it corresponds to the
+options "-unit -prefix -byte_binary_prefix -sexagesimal".
+
+
+=item B<-of, -print_format> I<writer_name>B<[=>I<writer_options>B<]>
+
+Set the output printing format.
+
+I<writer_name> specifies the name of the writer, and
+I<writer_options> specifies the options to be passed to the writer.
+
+For example for printing the output in JSON format, specify:
+	
+	-print_format json
+
+
+For more details on the available output printing formats, see the
+Writers section below.
+
+
+=item B<-select_streams> I<stream_specifier>
+
+Select only the streams specified by I<stream_specifier>. This
+option affects only the options related to streams
+(e.g. C<show_streams>, C<show_packets>, etc.).
+
+For example to show only audio streams, you can use the command:
+	
+	ffprobe -show_streams -select_streams a INPUT
+
+
+To show only video packets belonging to the video stream with index 1:
+	
+	ffprobe -show_packets -select_streams v:1 INPUT
+
+
+
+=item B<-show_data>
+
+Show payload data, as an hexadecimal and ASCII dump. Coupled with
+B<-show_packets>, it will dump the packets' data. Coupled with
+B<-show_streams>, it will dump the codec extradata.
+
+The dump is printed as the "data" field. It may contain newlines.
+
+
+=item B<-show_error>
+
+Show information about the error found when trying to probe the input.
+
+The error information is printed within a section with name "ERROR".
+
+
+=item B<-show_format>
+
+Show information about the container format of the input multimedia
+stream.
+
+All the container format information is printed within a section with
+name "FORMAT".
+
+
+=item B<-show_format_entry> I<name>
+
+Like B<-show_format>, but only prints the specified entry of the
+container format information, rather than all. This option may be given more
+than once, then all specified entries will be shown.
+
+
+=item B<-show_packets>
+
+Show information about each packet contained in the input multimedia
+stream.
+
+The information for each single packet is printed within a dedicated
+section with name "PACKET".
+
+
+=item B<-show_frames>
+
+Show information about each frame contained in the input multimedia
+stream.
+
+The information for each single frame is printed within a dedicated
+section with name "FRAME".
+
+
+=item B<-show_streams>
+
+Show information about each media stream contained in the input
+multimedia stream.
+
+Each media stream information is printed within a dedicated section
+with name "STREAM".
+
+
+=item B<-count_frames>
+
+Count the number of frames per stream and report it in the
+corresponding stream section.
+
+
+=item B<-count_packets>
+
+Count the number of packets per stream and report it in the
+corresponding stream section.
+
+
+=item B<-show_private_data, -private>
+
+Show private data, that is data depending on the format of the
+particular shown element.
+This option is enabled by default, but you may need to disable it
+for specific uses, for example when creating XSD-compliant XML output.
+
+
+=item B<-show_program_version>
+
+Show information related to program version.
+
+Version information is printed within a section with name
+"PROGRAM_VERSION".
+
+
+=item B<-show_library_versions>
+
+Show information related to library versions.
+
+Version information for each library is printed within a section with
+name "LIBRARY_VERSION".
+
+
+=item B<-show_versions>
+
+Show information related to program and library versions. This is the
+equivalent of setting both B<-show_program_version> and
+B<-show_library_versions> options.
+
+
+=item B<-bitexact>
+
+Force bitexact output, useful to produce output which is not dependent
+on the specific build.
+
+
+=item B<-i> I<input_file>
+
+Read I<input_file>.
+
+
+=back
+
+
+=head1 WRITERS
+
+
+A writer defines the output format adopted by B<ffprobe>, and will be
+used for printing all the parts of the output.
+
+A writer may accept one or more arguments, which specify the options to
+adopt.
+
+A description of the currently available writers follows.
+
+
+=head2 default
+
+Default format.
+
+Print each section in the form:
+	
+	[SECTION]
+	key1=val1
+	...
+	keyN=valN
+	[/SECTION]
+
+
+Metadata tags are printed as a line in the corresponding FORMAT or
+STREAM section, and are prefixed by the string "TAG:".
+
+This writer accepts options as a list of I<key>=I<value> pairs,
+separated by ":".
+
+A description of the accepted options follows.
+
+
+=over 4
+
+
+
+=item B<nokey, nk>
+
+If set to 1 specify not to print the key of each field. Default value
+is 0.
+
+
+=item B<noprint_wrappers, nw>
+
+If set to 1 specify not to print the section header and footer.
+Default value is 0.
+
+=back
+
+
+
+=head2 compact, csv
+
+Compact and CSV format.
+
+The C<csv> writer is equivalent to C<compact>, but supports
+different defaults.
+
+Each section is printed on a single line.
+If no option is specifid, the output has the form:
+	
+	section|key1=val1| ... |keyN=valN
+
+
+Metadata tags are printed in the corresponding "format" or "stream"
+section. A metadata tag key, if printed, is prefixed by the string
+"tag:".
+
+This writer accepts options as a list of I<key>=I<value> pairs,
+separated by ":".
+
+The description of the accepted options follows.
+
+
+=over 4
+
+
+
+=item B<item_sep, s>
+
+Specify the character to use for separating fields in the output line.
+It must be a single printable character, it is "|" by default ("," for
+the C<csv> writer).
+
+
+=item B<nokey, nk>
+
+If set to 1 specify not to print the key of each field. Its default
+value is 0 (1 for the C<csv> writer).
+
+
+=item B<escape, e>
+
+Set the escape mode to use, default to "c" ("csv" for the C<csv>
+writer).
+
+It can assume one of the following values:
+
+=over 4
+
+
+=item B<c>
+
+Perform C-like escaping. Strings containing a newline ('\n'), carriage
+return ('\r'), a tab ('\t'), a form feed ('\f'), the escaping
+character ('\') or the item separator character I<SEP> are escaped using C-like fashioned
+escaping, so that a newline is converted to the sequence "\n", a
+carriage return to "\r", '\' to "\\" and the separator I<SEP> is
+converted to "\I<SEP>".
+
+
+=item B<csv>
+
+Perform CSV-like escaping, as described in RFC4180.  Strings
+containing a newline ('\n'), a carriage return ('\r'), a double quote
+('"'), or I<SEP> are enclosed in double-quotes.
+
+
+=item B<none>
+
+Perform no escaping.
+
+=back
+
+
+
+=item B<print_section, p>
+
+Print the section name at the begin of each line if the value is
+C<1>, disable it with value set to C<0>. Default value is
+C<1>.
+
+
+=back
+
+
+
+=head2 flat
+
+Flat format.
+
+A free-form output where each line contains an explicit key=value, such as
+"streams.stream.3.tags.foo=bar". The output is shell escaped, so it can be
+directly embedded in sh scripts as long as the separator character is an
+alphanumeric character or an underscore (see I<sep_char> option).
+
+This writer accepts options as a list of I<key>=I<value> pairs,
+separated by ":".
+
+The description of the accepted options follows.
+
+
+=over 4
+
+
+=item B<sep_char, s>
+
+Separator character used to separate the chapter, the section name, IDs and
+potential tags in the printed field key.
+
+Default value is '.'.
+
+
+=item B<hierarchical, h>
+
+Specify if the section name specification should be hierarchical. If
+set to 1, and if there is more than one section in the current
+chapter, the section name will be prefixed by the name of the
+chapter. A value of 0 will disable this behavior.
+
+Default value is 1.
+
+=back
+
+
+
+=head2 ini
+
+INI format output.
+
+Print output in an INI based format.
+
+The following conventions are adopted:
+
+
+=over 4
+
+
+=item *
+
+all key and values are UTF-8
+
+=item *
+
+'.' is the subgroup separator
+
+=item *
+
+newline, '\t', '\f', '\b' and the following characters are escaped
+
+=item *
+
+'\' is the escape character
+
+=item *
+
+'#' is the comment indicator
+
+=item *
+
+'=' is the key/value separator
+
+=item *
+
+':' is not used but usually parsed as key/value separator
+
+=back
+
+
+This writer accepts options as a list of I<key>=I<value> pairs,
+separated by ":".
+
+The description of the accepted options follows.
+
+
+=over 4
+
+
+=item B<hierarchical, h>
+
+Specify if the section name specification should be hierarchical. If
+set to 1, and if there is more than one section in the current
+chapter, the section name will be prefixed by the name of the
+chapter. A value of 0 will disable this behavior.
+
+Default value is 1.
+
+=back
+
+
+
+=head2 json
+
+JSON based format.
+
+Each section is printed using JSON notation.
+
+This writer accepts options as a list of I<key>=I<value> pairs,
+separated by ":".
+
+The description of the accepted options follows.
+
+
+=over 4
+
+
+
+=item B<compact, c>
+
+If set to 1 enable compact output, that is each section will be
+printed on a single line. Default value is 0.
+
+=back
+
+
+For more information about JSON, see E<lt>B<http://www.json.org/>E<gt>.
+
+
+=head2 xml
+
+XML based format.
+
+The XML output is described in the XML schema description file
+F<ffprobe.xsd> installed in the FFmpeg datadir.
+
+An updated version of the schema can be retrieved at the url
+E<lt>B<http://www.ffmpeg.org/schema/ffprobe.xsd>E<gt>, which redirects to the
+latest schema committed into the FFmpeg development source code tree.
+
+Note that the output issued will be compliant to the
+F<ffprobe.xsd> schema only when no special global output options
+(B<unit>, B<prefix>, B<byte_binary_prefix>,
+B<sexagesimal> etc.) are specified.
+
+This writer accepts options as a list of I<key>=I<value> pairs,
+separated by ":".
+
+The description of the accepted options follows.
+
+
+=over 4
+
+
+
+=item B<fully_qualified, q>
+
+If set to 1 specify if the output should be fully qualified. Default
+value is 0.
+This is required for generating an XML file which can be validated
+through an XSD file.
+
+
+=item B<xsd_compliant, x>
+
+If set to 1 perform more checks for ensuring that the output is XSD
+compliant. Default value is 0.
+This option automatically sets B<fully_qualified> to 1.
+
+=back
+
+
+For more information about the XML format, see
+E<lt>B<http://www.w3.org/XML/>E<gt>.
+
+=head1 TIMECODE
+
+
+B<ffprobe> supports Timecode extraction:
+
+
+=over 4
+
+
+
+=item *
+
+MPEG1/2 timecode is extracted from the GOP, and is available in the video
+stream details (B<-show_streams>, see I<timecode>).
+
+
+=item *
+
+MOV timecode is extracted from tmcd track, so is available in the tmcd
+stream metadata (B<-show_streams>, see I<TAG:timecode>).
+
+
+=item *
+
+DV, GXF and AVI timecodes are available in format metadata
+(B<-show_format>, see I<TAG:timecode>).
+
+
+=back
+
+
+=head1 SYNTAX
+
+
+This section documents the syntax and formats employed by the FFmpeg
+libraries and tools.
+
+
+
+=head2 Quoting and escaping
+
+
+FFmpeg adopts the following quoting and escaping mechanism, unless
+explicitly specified. The following rules are applied:
+
+
+=over 4
+
+
+=item *
+
+C<'> and C<\> are special characters (respectively used for
+quoting and escaping). In addition to them, there might be other
+special characters depending on the specific syntax where the escaping
+and quoting are employed.
+
+
+=item *
+
+A special character is escaped by prefixing it with a '\'.
+
+
+=item *
+
+All characters enclosed between '' are included literally in the
+parsed string. The quote character C<'> itself cannot be quoted,
+so you may need to close the quote and escape it.
+
+
+=item *
+
+Leading and trailing whitespaces, unless escaped or quoted, are
+removed from the parsed string.
+
+=back
+
+
+Note that you may need to add a second level of escaping when using
+the command line or a script, which depends on the syntax of the
+adopted shell language.
+
+The function C<av_get_token> defined in
+F<libavutil/avstring.h> can be used to parse a token quoted or
+escaped according to the rules defined above.
+
+The tool F<tools/ffescape> in the FFmpeg source tree can be used
+to automatically quote or escape a string in a script.
+
+
+=head3 Examples
+
+
+
+=over 4
+
+
+=item *
+
+Escape the string C<Crime d'Amour> containing the C<'> special
+character:
+	
+	Crime d\'Amour
+
+
+
+=item *
+
+The string above contains a quote, so the C<'> needs to be escaped
+when quoting it:
+	
+	'Crime d'\''Amour'
+
+
+
+=item *
+
+Include leading or trailing whitespaces using quoting:
+	
+	'  this string starts and ends with whitespaces  '
+
+
+
+=item *
+
+Escaping and quoting can be mixed together:
+	
+	' The string '\'string\'' is a string '
+
+
+
+=item *
+
+To include a literal C<\> you can use either escaping or quoting:
+	
+	'c:\foo' can be written as c:\\foo
+
+
+=back
+
+
+
+
+=head2 Date
+
+
+The accepted syntax is:
+	
+	[(YYYY-MM-DD|YYYYMMDD)[T|t| ]]((HH:MM:SS[.m...]]])|(HHMMSS[.m...]]]))[Z]
+	now
+
+
+If the value is "now" it takes the current time.
+
+Time is local time unless Z is appended, in which case it is
+interpreted as UTC.
+If the year-month-day part is not specified it takes the current
+year-month-day.
+
+
+
+=head2 Time duration
+
+
+The accepted syntax is:
+	
+	[-]HH:MM:SS[.m...]
+	[-]S+[.m...]
+
+
+I<HH> expresses the number of hours, I<MM> the number a of minutes
+and I<SS> the number of seconds.
+
+
+
+=head2 Video size
+
+Specify the size of the sourced video, it may be a string of the form
+I<width>xI<height>, or the name of a size abbreviation.
+
+The following abbreviations are recognized:
+
+=over 4
+
+
+=item B<sqcif>
+
+128x96
+
+=item B<qcif>
+
+176x144
+
+=item B<cif>
+
+352x288
+
+=item B<4cif>
+
+704x576
+
+=item B<16cif>
+
+1408x1152
+
+=item B<qqvga>
+
+160x120
+
+=item B<qvga>
+
+320x240
+
+=item B<vga>
+
+640x480
+
+=item B<svga>
+
+800x600
+
+=item B<xga>
+
+1024x768
+
+=item B<uxga>
+
+1600x1200
+
+=item B<qxga>
+
+2048x1536
+
+=item B<sxga>
+
+1280x1024
+
+=item B<qsxga>
+
+2560x2048
+
+=item B<hsxga>
+
+5120x4096
+
+=item B<wvga>
+
+852x480
+
+=item B<wxga>
+
+1366x768
+
+=item B<wsxga>
+
+1600x1024
+
+=item B<wuxga>
+
+1920x1200
+
+=item B<woxga>
+
+2560x1600
+
+=item B<wqsxga>
+
+3200x2048
+
+=item B<wquxga>
+
+3840x2400
+
+=item B<whsxga>
+
+6400x4096
+
+=item B<whuxga>
+
+7680x4800
+
+=item B<cga>
+
+320x200
+
+=item B<ega>
+
+640x350
+
+=item B<hd480>
+
+852x480
+
+=item B<hd720>
+
+1280x720
+
+=item B<hd1080>
+
+1920x1080
+
+=back
+
+
+
+
+=head2 Video rate
+
+
+Specify the frame rate of a video, expressed as the number of frames
+generated per second. It has to be a string in the format
+I<frame_rate_num>/I<frame_rate_den>, an integer number, a float
+number or a valid video frame rate abbreviation.
+
+The following abbreviations are recognized:
+
+=over 4
+
+
+=item B<ntsc>
+
+30000/1001
+
+=item B<pal>
+
+25/1
+
+=item B<qntsc>
+
+30000/1
+
+=item B<qpal>
+
+25/1
+
+=item B<sntsc>
+
+30000/1
+
+=item B<spal>
+
+25/1
+
+=item B<film>
+
+24/1
+
+=item B<ntsc-film>
+
+24000/1
+
+=back
+
+
+
+
+=head2 Ratio
+
+
+A ratio can be expressed as an expression, or in the form
+I<numerator>:I<denominator>.
+
+Note that a ratio with infinite (1/0) or negative value is
+considered valid, so you should check on the returned value if you
+want to exclude those values.
+
+The undefined value can be expressed using the "0:0" string.
+
+
+
+=head2 Color
+
+
+It can be the name of a color (case insensitive match) or a
+[0x|#]RRGGBB[AA] sequence, possibly followed by "@" and a string
+representing the alpha component.
+
+The alpha component may be a string composed by "0x" followed by an
+hexadecimal number or a decimal number between 0.0 and 1.0, which
+represents the opacity value (0x00/0.0 means completely transparent,
+0xff/1.0 completely opaque).
+If the alpha component is not specified then 0xff is assumed.
+
+The string "random" will result in a random color.
+
+
+=head1 DECODERS
+
+
+Decoders are configured elements in FFmpeg which allow the decoding of
+multimedia streams.
+
+When you configure your FFmpeg build, all the supported native decoders
+are enabled by default. Decoders requiring an external library must be enabled
+manually via the corresponding C<--enable-lib> option. You can list all
+available decoders using the configure option C<--list-decoders>.
+
+You can disable all the decoders with the configure option
+C<--disable-decoders> and selectively enable / disable single decoders
+with the options C<--enable-decoder=I<DECODER>> /
+C<--disable-decoder=I<DECODER>>.
+
+The option C<-codecs> of the ff* tools will display the list of
+enabled decoders.
+
+
+=head1 VIDEO DECODERS
+
+
+A description of some of the currently available video decoders
+follows.
+
+
+=head2 rawvideo
+
+
+Raw video decoder.
+
+This decoder decodes rawvideo streams.
+
+
+=head3 Options
+
+
+
+=over 4
+
+
+=item B<top> I<top_field_first>
+
+Specify the assumed field type of the input video.
+
+=over 4
+
+
+=item B<-1>
+
+the video is assumed to be progressive (default)
+
+=item B<0>
+
+bottom-field-first is assumed
+
+=item B<1>
+
+top-field-first is assumed
+
+=back
+
+
+
+=back
+
+
+
+=head1 AUDIO DECODERS
+
+
+
+=head2 ffwavesynth
+
+
+Internal wave synthetizer.
+
+This decoder generates wave patterns according to predefined sequences. Its
+use is purely internal and the format of the data it accepts is not publicly
+documented.
+
+
+=head1 DEMUXERS
+
+
+Demuxers are configured elements in FFmpeg which allow to read the
+multimedia streams from a particular type of file.
+
+When you configure your FFmpeg build, all the supported demuxers
+are enabled by default. You can list all available ones using the
+configure option "--list-demuxers".
+
+You can disable all the demuxers using the configure option
+"--disable-demuxers", and selectively enable a single demuxer with
+the option "--enable-demuxer=I<DEMUXER>", or disable it
+with the option "--disable-demuxer=I<DEMUXER>".
+
+The option "-formats" of the ff* tools will display the list of
+enabled demuxers.
+
+The description of some of the currently available demuxers follows.
+
+
+=head2 image2
+
+
+Image file demuxer.
+
+This demuxer reads from a list of image files specified by a pattern.
+The syntax and meaning of the pattern is specified by the
+option I<pattern_type>.
+
+The pattern may contain a suffix which is used to automatically
+determine the format of the images contained in the files.
+
+The size, the pixel format, and the format of each image must be the
+same for all the files in the sequence.
+
+This demuxer accepts the following options:
+
+=over 4
+
+
+=item B<framerate>
+
+Set the framerate for the video stream. It defaults to 25.
+
+=item B<loop>
+
+If set to 1, loop over the input. Default value is 0.
+
+=item B<pattern_type>
+
+Select the pattern type used to interpret the provided filename.
+
+I<pattern_type> accepts one of the following values.
+
+=over 4
+
+
+=item B<sequence>
+
+Select a sequence pattern type, used to specify a sequence of files
+indexed by sequential numbers.
+
+A sequence pattern may contain the string "%d" or "%0I<N>d", which
+specifies the position of the characters representing a sequential
+number in each filename matched by the pattern. If the form
+"%d0I<N>d" is used, the string representing the number in each
+filename is 0-padded and I<N> is the total number of 0-padded
+digits representing the number. The literal character '%' can be
+specified in the pattern with the string "%%".
+
+If the sequence pattern contains "%d" or "%0I<N>d", the first filename of
+the file list specified by the pattern must contain a number
+inclusively contained between I<start_number> and
+I<start_number>+I<start_number_range>-1, and all the following
+numbers must be sequential.
+
+For example the pattern "img-%03d.bmp" will match a sequence of
+filenames of the form F<img-001.bmp>, F<img-002.bmp>, ...,
+F<img-010.bmp>, etc.; the pattern "i%%m%%g-%d.jpg" will match a
+sequence of filenames of the form F<i%m%g-1.jpg>,
+F<i%m%g-2.jpg>, ..., F<i%m%g-10.jpg>, etc.
+
+Note that the pattern must not necessarily contain "%d" or
+"%0I<N>d", for example to convert a single image file
+F<img.jpeg> you can employ the command:
+	
+	ffmpeg -i img.jpeg img.png
+
+
+
+=item B<glob>
+
+Select a glob wildcard pattern type.
+
+The pattern is interpreted like a C<glob()> pattern. This is only
+selectable if libavformat was compiled with globbing support.
+
+
+=item B<glob_sequence> I<(deprecated, will be removed)>
+
+Select a mixed glob wildcard/sequence pattern.
+
+If your version of libavformat was compiled with globbing support, and
+the provided pattern contains at least one glob meta character among
+C<%*?[]{}> that is preceded by an unescaped "%", the pattern is
+interpreted like a C<glob()> pattern, otherwise it is interpreted
+like a sequence pattern.
+
+All glob special characters C<%*?[]{}> must be prefixed
+with "%". To escape a literal "%" you shall use "%%".
+
+For example the pattern C<foo-%*.jpeg> will match all the
+filenames prefixed by "foo-" and terminating with ".jpeg", and
+C<foo-%?%?%?.jpeg> will match all the filenames prefixed with
+"foo-", followed by a sequence of three characters, and terminating
+with ".jpeg".
+
+This pattern type is deprecated in favor of I<glob> and
+I<sequence>.
+
+=back
+
+
+Default value is I<glob_sequence>.
+
+=item B<pixel_format>
+
+Set the pixel format of the images to read. If not specified the pixel
+format is guessed from the first image file in the sequence.
+
+=item B<start_number>
+
+Set the index of the file matched by the image file pattern to start
+to read from. Default value is 0.
+
+=item B<start_number_range>
+
+Set the index interval range to check when looking for the first image
+file in the sequence, starting from I<start_number>. Default value
+is 5.
+
+=item B<video_size>
+
+Set the video size of the images to read. If not specified the video
+size is guessed from the first image file in the sequence.
+
+=back
+
+
+
+=head3 Examples
+
+
+
+=over 4
+
+
+=item *
+
+Use B<ffmpeg> for creating a video from the images in the file
+sequence F<img-001.jpeg>, F<img-002.jpeg>, ..., assuming an
+input frame rate of 10 frames per second:
+	
+	ffmpeg -i 'img-%03d.jpeg' -r 10 out.mkv
+
+
+
+=item *
+
+As above, but start by reading from a file with index 100 in the sequence:
+	
+	ffmpeg -start_number 100 -i 'img-%03d.jpeg' -r 10 out.mkv
+
+
+
+=item *
+
+Read images matching the "*.png" glob pattern , that is all the files
+terminating with the ".png" suffix:
+	
+	ffmpeg -pattern_type glob -i "*.png" -r 10 out.mkv
+
+
+=back
+
+
+
+=head2 applehttp
+
+
+Apple HTTP Live Streaming demuxer.
+
+This demuxer presents all AVStreams from all variant streams.
+The id field is set to the bitrate variant index number. By setting
+the discard flags on AVStreams (by pressing 'a' or 'v' in ffplay),
+the caller can decide which variant streams to actually receive.
+The total bitrate of the variant that the stream belongs to is
+available in a metadata key named "variant_bitrate".
+
+
+=head2 sbg
+
+
+SBaGen script demuxer.
+
+This demuxer reads the script language used by SBaGen
+E<lt>B<http://uazu.net/sbagen/>E<gt> to generate binaural beats sessions. A SBG
+script looks like that:
+	
+	-SE
+	a: 300-2.5/3 440+4.5/0
+	b: 300-2.5/0 440+4.5/3
+	off: -
+	NOW      == a
+	+0:07:00 == b
+	+0:14:00 == a
+	+0:21:00 == b
+	+0:30:00    off
+
+
+A SBG script can mix absolute and relative timestamps. If the script uses
+either only absolute timestamps (including the script start time) or only
+relative ones, then its layout is fixed, and the conversion is
+straightforward. On the other hand, if the script mixes both kind of
+timestamps, then the I<NOW> reference for relative timestamps will be
+taken from the current time of day at the time the script is read, and the
+script layout will be frozen according to that reference. That means that if
+the script is directly played, the actual times will match the absolute
+timestamps up to the sound controller's clock accuracy, but if the user
+somehow pauses the playback or seeks, all times will be shifted accordingly.
+
+
+=head1 PROTOCOLS
+
+
+Protocols are configured elements in FFmpeg which allow to access
+resources which require the use of a particular protocol.
+
+When you configure your FFmpeg build, all the supported protocols are
+enabled by default. You can list all available ones using the
+configure option "--list-protocols".
+
+You can disable all the protocols using the configure option
+"--disable-protocols", and selectively enable a protocol using the
+option "--enable-protocol=I<PROTOCOL>", or you can disable a
+particular protocol using the option
+"--disable-protocol=I<PROTOCOL>".
+
+The option "-protocols" of the ff* tools will display the list of
+supported protocols.
+
+A description of the currently available protocols follows.
+
+
+=head2 bluray
+
+
+Read BluRay playlist.
+
+The accepted options are:
+
+=over 4
+
+
+
+=item B<angle>
+
+BluRay angle
+
+
+=item B<chapter>
+
+Start chapter (1...N)
+
+
+=item B<playlist>
+
+Playlist to read (BDMV/PLAYLIST/?????.mpls)
+
+
+=back
+
+
+Examples:
+
+Read longest playlist from BluRay mounted to /mnt/bluray:
+	
+	bluray:/mnt/bluray
+
+
+Read angle 2 of playlist 4 from BluRay mounted to /mnt/bluray, start from chapter 2:
+	
+	-playlist 4 -angle 2 -chapter 2 bluray:/mnt/bluray
+
+
+
+=head2 concat
+
+
+Physical concatenation protocol.
+
+Allow to read and seek from many resource in sequence as if they were
+a unique resource.
+
+A URL accepted by this protocol has the syntax:
+	
+	concat:<URL1>|<URL2>|...|<URLN>
+
+
+where I<URL1>, I<URL2>, ..., I<URLN> are the urls of the
+resource to be concatenated, each one possibly specifying a distinct
+protocol.
+
+For example to read a sequence of files F<split1.mpeg>,
+F<split2.mpeg>, F<split3.mpeg> with B<ffplay> use the
+command:
+	
+	ffplay concat:split1.mpeg\|split2.mpeg\|split3.mpeg
+
+
+Note that you may need to escape the character "|" which is special for
+many shells.
+
+
+=head2 file
+
+
+File access protocol.
+
+Allow to read from or read to a file.
+
+For example to read from a file F<input.mpeg> with B<ffmpeg>
+use the command:
+	
+	ffmpeg -i file:input.mpeg output.mpeg
+
+
+The ff* tools default to the file protocol, that is a resource
+specified with the name "FILE.mpeg" is interpreted as the URL
+"file:FILE.mpeg".
+
+
+=head2 gopher
+
+
+Gopher protocol.
+
+
+=head2 hls
+
+
+Read Apple HTTP Live Streaming compliant segmented stream as
+a uniform one. The M3U8 playlists describing the segments can be
+remote HTTP resources or local files, accessed using the standard
+file protocol.
+The nested protocol is declared by specifying
+"+I<proto>" after the hls URI scheme name, where I<proto>
+is either "file" or "http".
+
+	
+	hls+http://host/path/to/remote/resource.m3u8
+	hls+file://path/to/local/resource.m3u8
+
+
+Using this protocol is discouraged - the hls demuxer should work
+just as well (if not, please report the issues) and is more complete.
+To use the hls demuxer instead, simply use the direct URLs to the
+m3u8 files.
+
+
+=head2 http
+
+
+HTTP (Hyper Text Transfer Protocol).
+
+
+=head2 mmst
+
+
+MMS (Microsoft Media Server) protocol over TCP.
+
+
+=head2 mmsh
+
+
+MMS (Microsoft Media Server) protocol over HTTP.
+
+The required syntax is:
+	
+	mmsh://<server>[:<port>][/<app>][/<playpath>]
+
+
+
+=head2 md5
+
+
+MD5 output protocol.
+
+Computes the MD5 hash of the data to be written, and on close writes
+this to the designated output or stdout if none is specified. It can
+be used to test muxers without writing an actual file.
+
+Some examples follow.
+	
+	# Write the MD5 hash of the encoded AVI file to the file output.avi.md5.
+	ffmpeg -i input.flv -f avi -y md5:output.avi.md5
+	
+	# Write the MD5 hash of the encoded AVI file to stdout.
+	ffmpeg -i input.flv -f avi -y md5:
+
+
+Note that some formats (typically MOV) require the output protocol to
+be seekable, so they will fail with the MD5 output protocol.
+
+
+=head2 pipe
+
+
+UNIX pipe access protocol.
+
+Allow to read and write from UNIX pipes.
+
+The accepted syntax is:
+	
+	pipe:[<number>]
+
+
+I<number> is the number corresponding to the file descriptor of the
+pipe (e.g. 0 for stdin, 1 for stdout, 2 for stderr).  If I<number>
+is not specified, by default the stdout file descriptor will be used
+for writing, stdin for reading.
+
+For example to read from stdin with B<ffmpeg>:
+	
+	cat test.wav | ffmpeg -i pipe:0
+	# ...this is the same as...
+	cat test.wav | ffmpeg -i pipe:
+
+
+For writing to stdout with B<ffmpeg>:
+	
+	ffmpeg -i test.wav -f avi pipe:1 | cat > test.avi
+	# ...this is the same as...
+	ffmpeg -i test.wav -f avi pipe: | cat > test.avi
+
+
+Note that some formats (typically MOV), require the output protocol to
+be seekable, so they will fail with the pipe output protocol.
+
+
+=head2 rtmp
+
+
+Real-Time Messaging Protocol.
+
+The Real-Time Messaging Protocol (RTMP) is used for streaming multimedia
+content across a TCP/IP network.
+
+The required syntax is:
+	
+	rtmp://<server>[:<port>][/<app>][/<instance>][/<playpath>]
+
+
+The accepted parameters are:
+
+=over 4
+
+
+
+=item B<server>
+
+The address of the RTMP server.
+
+
+=item B<port>
+
+The number of the TCP port to use (by default is 1935).
+
+
+=item B<app>
+
+It is the name of the application to access. It usually corresponds to
+the path where the application is installed on the RTMP server
+(e.g. F</ondemand/>, F</flash/live/>, etc.). You can override
+the value parsed from the URI through the C<rtmp_app> option, too.
+
+
+=item B<playpath>
+
+It is the path or name of the resource to play with reference to the
+application specified in I<app>, may be prefixed by "mp4:". You
+can override the value parsed from the URI through the C<rtmp_playpath>
+option, too.
+
+
+=item B<listen>
+
+Act as a server, listening for an incoming connection.
+
+
+=item B<timeout>
+
+Maximum time to wait for the incoming connection. Implies listen.
+
+=back
+
+
+Additionally, the following parameters can be set via command line options
+(or in code via C<AVOption>s):
+
+=over 4
+
+
+
+=item B<rtmp_app>
+
+Name of application to connect on the RTMP server. This option
+overrides the parameter specified in the URI.
+
+
+=item B<rtmp_buffer>
+
+Set the client buffer time in milliseconds. The default is 3000.
+
+
+=item B<rtmp_conn>
+
+Extra arbitrary AMF connection parameters, parsed from a string,
+e.g. like C<B:1 S:authMe O:1 NN:code:1.23 NS:flag:ok O:0>.
+Each value is prefixed by a single character denoting the type,
+B for Boolean, N for number, S for string, O for object, or Z for null,
+followed by a colon. For Booleans the data must be either 0 or 1 for
+FALSE or TRUE, respectively.  Likewise for Objects the data must be 0 or
+1 to end or begin an object, respectively. Data items in subobjects may
+be named, by prefixing the type with 'N' and specifying the name before
+the value (i.e. C<NB:myFlag:1>). This option may be used multiple
+times to construct arbitrary AMF sequences.
+
+
+=item B<rtmp_flashver>
+
+Version of the Flash plugin used to run the SWF player. The default
+is LNX 9,0,124,2.
+
+
+=item B<rtmp_flush_interval>
+
+Number of packets flushed in the same request (RTMPT only). The default
+is 10.
+
+
+=item B<rtmp_live>
+
+Specify that the media is a live stream. No resuming or seeking in
+live streams is possible. The default value is C<any>, which means the
+subscriber first tries to play the live stream specified in the
+playpath. If a live stream of that name is not found, it plays the
+recorded stream. The other possible values are C<live> and
+C<recorded>.
+
+
+=item B<rtmp_pageurl>
+
+URL of the web page in which the media was embedded. By default no
+value will be sent.
+
+
+=item B<rtmp_playpath>
+
+Stream identifier to play or to publish. This option overrides the
+parameter specified in the URI.
+
+
+=item B<rtmp_subscribe>
+
+Name of live stream to subscribe to. By default no value will be sent.
+It is only sent if the option is specified or if rtmp_live
+is set to live.
+
+
+=item B<rtmp_swfhash>
+
+SHA256 hash of the decompressed SWF file (32 bytes).
+
+
+=item B<rtmp_swfsize>
+
+Size of the decompressed SWF file, required for SWFVerification.
+
+
+=item B<rtmp_swfurl>
+
+URL of the SWF player for the media. By default no value will be sent.
+
+
+=item B<rtmp_swfverify>
+
+URL to player swf file, compute hash/size automatically.
+
+
+=item B<rtmp_tcurl>
+
+URL of the target stream. Defaults to proto://host[:port]/app.
+
+
+=back
+
+
+For example to read with B<ffplay> a multimedia resource named
+"sample" from the application "vod" from an RTMP server "myserver":
+	
+	ffplay rtmp://myserver/vod/sample
+
+
+
+=head2 rtmpe
+
+
+Encrypted Real-Time Messaging Protocol.
+
+The Encrypted Real-Time Messaging Protocol (RTMPE) is used for
+streaming multimedia content within standard cryptographic primitives,
+consisting of Diffie-Hellman key exchange and HMACSHA256, generating
+a pair of RC4 keys.
+
+
+=head2 rtmps
+
+
+Real-Time Messaging Protocol over a secure SSL connection.
+
+The Real-Time Messaging Protocol (RTMPS) is used for streaming
+multimedia content across an encrypted connection.
+
+
+=head2 rtmpt
+
+
+Real-Time Messaging Protocol tunneled through HTTP.
+
+The Real-Time Messaging Protocol tunneled through HTTP (RTMPT) is used
+for streaming multimedia content within HTTP requests to traverse
+firewalls.
+
+
+=head2 rtmpte
+
+
+Encrypted Real-Time Messaging Protocol tunneled through HTTP.
+
+The Encrypted Real-Time Messaging Protocol tunneled through HTTP (RTMPTE)
+is used for streaming multimedia content within HTTP requests to traverse
+firewalls.
+
+
+=head2 rtmpts
+
+
+Real-Time Messaging Protocol tunneled through HTTPS.
+
+The Real-Time Messaging Protocol tunneled through HTTPS (RTMPTS) is used
+for streaming multimedia content within HTTPS requests to traverse
+firewalls.
+
+
+=head2 rtmp, rtmpe, rtmps, rtmpt, rtmpte
+
+
+Real-Time Messaging Protocol and its variants supported through
+librtmp.
+
+Requires the presence of the librtmp headers and library during
+configuration. You need to explicitly configure the build with
+"--enable-librtmp". If enabled this will replace the native RTMP
+protocol.
+
+This protocol provides most client functions and a few server
+functions needed to support RTMP, RTMP tunneled in HTTP (RTMPT),
+encrypted RTMP (RTMPE), RTMP over SSL/TLS (RTMPS) and tunneled
+variants of these encrypted types (RTMPTE, RTMPTS).
+
+The required syntax is:
+	
+	<rtmp_proto>://<server>[:<port>][/<app>][/<playpath>] <options>
+
+
+where I<rtmp_proto> is one of the strings "rtmp", "rtmpt", "rtmpe",
+"rtmps", "rtmpte", "rtmpts" corresponding to each RTMP variant, and
+I<server>, I<port>, I<app> and I<playpath> have the same
+meaning as specified for the RTMP native protocol.
+I<options> contains a list of space-separated options of the form
+I<key>=I<val>.
+
+See the librtmp manual page (man 3 librtmp) for more information.
+
+For example, to stream a file in real-time to an RTMP server using
+B<ffmpeg>:
+	
+	ffmpeg -re -i myfile -f flv rtmp://myserver/live/mystream
+
+
+To play the same stream using B<ffplay>:
+	
+	ffplay "rtmp://myserver/live/mystream live=1"
+
+
+
+=head2 rtp
+
+
+Real-Time Protocol.
+
+
+=head2 rtsp
+
+
+RTSP is not technically a protocol handler in libavformat, it is a demuxer
+and muxer. The demuxer supports both normal RTSP (with data transferred
+over RTP; this is used by e.g. Apple and Microsoft) and Real-RTSP (with
+data transferred over RDT).
+
+The muxer can be used to send a stream using RTSP ANNOUNCE to a server
+supporting it (currently Darwin Streaming Server and Mischa Spiegelmock's
+ RTSP server (C<http://github.com/revmischa/rtsp-server>)).
+
+The required syntax for a RTSP url is:
+	
+	rtsp://<hostname>[:<port>]/<path>
+
+
+The following options (set on the B<ffmpeg>/B<ffplay> command
+line, or set in code via C<AVOption>s or in C<avformat_open_input>),
+are supported:
+
+Flags for C<rtsp_transport>:
+
+
+=over 4
+
+
+
+=item B<udp>
+
+Use UDP as lower transport protocol.
+
+
+=item B<tcp>
+
+Use TCP (interleaving within the RTSP control channel) as lower
+transport protocol.
+
+
+=item B<udp_multicast>
+
+Use UDP multicast as lower transport protocol.
+
+
+=item B<http>
+
+Use HTTP tunneling as lower transport protocol, which is useful for
+passing proxies.
+
+=back
+
+
+Multiple lower transport protocols may be specified, in that case they are
+tried one at a time (if the setup of one fails, the next one is tried).
+For the muxer, only the C<tcp> and C<udp> options are supported.
+
+Flags for C<rtsp_flags>:
+
+
+=over 4
+
+
+=item B<filter_src>
+
+Accept packets only from negotiated peer address and port.
+
+=item B<listen>
+
+Act as a server, listening for an incoming connection.
+
+=back
+
+
+When receiving data over UDP, the demuxer tries to reorder received packets
+(since they may arrive out of order, or packets may get lost totally). This
+can be disabled by setting the maximum demuxing delay to zero (via
+the C<max_delay> field of AVFormatContext).
+
+When watching multi-bitrate Real-RTSP streams with B<ffplay>, the
+streams to display can be chosen with C<-vst> I<n> and
+C<-ast> I<n> for video and audio respectively, and can be switched
+on the fly by pressing C<v> and C<a>.
+
+Example command lines:
+
+To watch a stream over UDP, with a max reordering delay of 0.5 seconds:
+
+	
+	ffplay -max_delay 500000 -rtsp_transport udp rtsp://server/video.mp4
+
+
+To watch a stream tunneled over HTTP:
+
+	
+	ffplay -rtsp_transport http rtsp://server/video.mp4
+
+
+To send a stream in realtime to a RTSP server, for others to watch:
+
+	
+	ffmpeg -re -i <input> -f rtsp -muxdelay 0.1 rtsp://server/live.sdp
+
+
+To receive a stream in realtime:
+
+	
+	ffmpeg -rtsp_flags listen -i rtsp://ownaddress/live.sdp <output>
+
+
+
+=head2 sap
+
+
+Session Announcement Protocol (RFC 2974). This is not technically a
+protocol handler in libavformat, it is a muxer and demuxer.
+It is used for signalling of RTP streams, by announcing the SDP for the
+streams regularly on a separate port.
+
+
+=head3 Muxer
+
+
+The syntax for a SAP url given to the muxer is:
+	
+	sap://<destination>[:<port>][?<options>]
+
+
+The RTP packets are sent to I<destination> on port I<port>,
+or to port 5004 if no port is specified.
+I<options> is a C<&>-separated list. The following options
+are supported:
+
+
+=over 4
+
+
+
+=item B<announce_addr=>I<address>
+
+Specify the destination IP address for sending the announcements to.
+If omitted, the announcements are sent to the commonly used SAP
+announcement multicast address 224.2.127.254 (sap.mcast.net), or
+ff0e::2:7ffe if I<destination> is an IPv6 address.
+
+
+=item B<announce_port=>I<port>
+
+Specify the port to send the announcements on, defaults to
+9875 if not specified.
+
+
+=item B<ttl=>I<ttl>
+
+Specify the time to live value for the announcements and RTP packets,
+defaults to 255.
+
+
+=item B<same_port=>I<0|1>
+
+If set to 1, send all RTP streams on the same port pair. If zero (the
+default), all streams are sent on unique ports, with each stream on a
+port 2 numbers higher than the previous.
+VLC/Live555 requires this to be set to 1, to be able to receive the stream.
+The RTP stack in libavformat for receiving requires all streams to be sent
+on unique ports.
+
+=back
+
+
+Example command lines follow.
+
+To broadcast a stream on the local subnet, for watching in VLC:
+
+	
+	ffmpeg -re -i <input> -f sap sap://224.0.0.255?same_port=1
+
+
+Similarly, for watching in B<ffplay>:
+
+	
+	ffmpeg -re -i <input> -f sap sap://224.0.0.255
+
+
+And for watching in B<ffplay>, over IPv6:
+
+	
+	ffmpeg -re -i <input> -f sap sap://[ff0e::1:2:3:4]
+
+
+
+=head3 Demuxer
+
+
+The syntax for a SAP url given to the demuxer is:
+	
+	sap://[<address>][:<port>]
+
+
+I<address> is the multicast address to listen for announcements on,
+if omitted, the default 224.2.127.254 (sap.mcast.net) is used. I<port>
+is the port that is listened on, 9875 if omitted.
+
+The demuxers listens for announcements on the given address and port.
+Once an announcement is received, it tries to receive that particular stream.
+
+Example command lines follow.
+
+To play back the first stream announced on the normal SAP multicast address:
+
+	
+	ffplay sap://
+
+
+To play back the first stream announced on one the default IPv6 SAP multicast address:
+
+	
+	ffplay sap://[ff0e::2:7ffe]
+
+
+
+=head2 tcp
+
+
+Trasmission Control Protocol.
+
+The required syntax for a TCP url is:
+	
+	tcp://<hostname>:<port>[?<options>]
+
+
+
+=over 4
+
+
+
+=item B<listen>
+
+Listen for an incoming connection
+
+
+=item B<timeout=>I<microseconds>
+
+In read mode: if no data arrived in more than this time interval, raise error.
+In write mode: if socket cannot be written in more than this time interval, raise error.
+This also sets timeout on TCP connection establishing.
+
+	
+	ffmpeg -i <input> -f <format> tcp://<hostname>:<port>?listen
+	ffplay tcp://<hostname>:<port>
+
+
+
+=back
+
+
+
+=head2 tls
+
+
+Transport Layer Security/Secure Sockets Layer
+
+The required syntax for a TLS/SSL url is:
+	
+	tls://<hostname>:<port>[?<options>]
+
+
+
+=over 4
+
+
+
+=item B<listen>
+
+Act as a server, listening for an incoming connection.
+
+
+=item B<cafile=>I<filename>
+
+Certificate authority file. The file must be in OpenSSL PEM format.
+
+
+=item B<cert=>I<filename>
+
+Certificate file. The file must be in OpenSSL PEM format.
+
+
+=item B<key=>I<filename>
+
+Private key file.
+
+
+=item B<verify=>I<0|1>
+
+Verify the peer's certificate.
+
+
+=back
+
+
+Example command lines:
+
+To create a TLS/SSL server that serves an input stream.
+
+	
+	ffmpeg -i <input> -f <format> tls://<hostname>:<port>?listen&cert=<server.crt>&key=<server.key>
+
+
+To play back a stream from the TLS/SSL server using B<ffplay>:
+
+	
+	ffplay tls://<hostname>:<port>
+
+
+
+=head2 udp
+
+
+User Datagram Protocol.
+
+The required syntax for a UDP url is:
+	
+	udp://<hostname>:<port>[?<options>]
+
+
+I<options> contains a list of &-separated options of the form I<key>=I<val>.
+
+In case threading is enabled on the system, a circular buffer is used
+to store the incoming data, which allows to reduce loss of data due to
+UDP socket buffer overruns. The I<fifo_size> and
+I<overrun_nonfatal> options are related to this buffer.
+
+The list of supported options follows.
+
+
+=over 4
+
+
+
+=item B<buffer_size=>I<size>
+
+Set the UDP socket buffer size in bytes. This is used both for the
+receiving and the sending buffer size.
+
+
+=item B<localport=>I<port>
+
+Override the local UDP port to bind with.
+
+
+=item B<localaddr=>I<addr>
+
+Choose the local IP address. This is useful e.g. if sending multicast
+and the host has multiple interfaces, where the user can choose
+which interface to send on by specifying the IP address of that interface.
+
+
+=item B<pkt_size=>I<size>
+
+Set the size in bytes of UDP packets.
+
+
+=item B<reuse=>I<1|0>
+
+Explicitly allow or disallow reusing UDP sockets.
+
+
+=item B<ttl=>I<ttl>
+
+Set the time to live value (for multicast only).
+
+
+=item B<connect=>I<1|0>
+
+Initialize the UDP socket with C<connect()>. In this case, the
+destination address can't be changed with ff_udp_set_remote_url later.
+If the destination address isn't known at the start, this option can
+be specified in ff_udp_set_remote_url, too.
+This allows finding out the source address for the packets with getsockname,
+and makes writes return with AVERROR(ECONNREFUSED) if "destination
+unreachable" is received.
+For receiving, this gives the benefit of only receiving packets from
+the specified peer address/port.
+
+
+=item B<sources=>I<address>B<[,>I<address>B<]>
+
+Only receive packets sent to the multicast group from one of the
+specified sender IP addresses.
+
+
+=item B<block=>I<address>B<[,>I<address>B<]>
+
+Ignore packets sent to the multicast group from the specified
+sender IP addresses.
+
+
+=item B<fifo_size=>I<units>
+
+Set the UDP receiving circular buffer size, expressed as a number of
+packets with size of 188 bytes. If not specified defaults to 7*4096.
+
+
+=item B<overrun_nonfatal=>I<1|0>
+
+Survive in case of UDP receiving circular buffer overrun. Default
+value is 0.
+
+
+=item B<timeout=>I<microseconds>
+
+In read mode: if no data arrived in more than this time interval, raise error.
+
+=back
+
+
+Some usage examples of the UDP protocol with B<ffmpeg> follow.
+
+To stream over UDP to a remote endpoint:
+	
+	ffmpeg -i <input> -f <format> udp://<hostname>:<port>
+
+
+To stream in mpegts format over UDP using 188 sized UDP packets, using a large input buffer:
+	
+	ffmpeg -i <input> -f mpegts udp://<hostname>:<port>?pkt_size=188&buffer_size=65535
+
+
+To receive over UDP from a remote endpoint:
+	
+	ffmpeg -i udp://[<multicast-address>]:<port>
+
+
+
+=head1 INPUT DEVICES
+
+
+Input devices are configured elements in FFmpeg which allow to access
+the data coming from a multimedia device attached to your system.
+
+When you configure your FFmpeg build, all the supported input devices
+are enabled by default. You can list all available ones using the
+configure option "--list-indevs".
+
+You can disable all the input devices using the configure option
+"--disable-indevs", and selectively enable an input device using the
+option "--enable-indev=I<INDEV>", or you can disable a particular
+input device using the option "--disable-indev=I<INDEV>".
+
+The option "-formats" of the ff* tools will display the list of
+supported input devices (amongst the demuxers).
+
+A description of the currently available input devices follows.
+
+
+=head2 alsa
+
+
+ALSA (Advanced Linux Sound Architecture) input device.
+
+To enable this input device during configuration you need libasound
+installed on your system.
+
+This device allows capturing from an ALSA device. The name of the
+device to capture has to be an ALSA card identifier.
+
+An ALSA identifier has the syntax:
+	
+	hw:<CARD>[,<DEV>[,<SUBDEV>]]
+
+
+where the I<DEV> and I<SUBDEV> components are optional.
+
+The three arguments (in order: I<CARD>,I<DEV>,I<SUBDEV>)
+specify card number or identifier, device number and subdevice number
+(-1 means any).
+
+To see the list of cards currently recognized by your system check the
+files F</proc/asound/cards> and F</proc/asound/devices>.
+
+For example to capture with B<ffmpeg> from an ALSA device with
+card id 0, you may run the command:
+	
+	ffmpeg -f alsa -i hw:0 alsaout.wav
+
+
+For more information see:
+E<lt>B<http://www.alsa-project.org/alsa-doc/alsa-lib/pcm.html>E<gt>
+
+
+=head2 bktr
+
+
+BSD video input device.
+
+
+=head2 dshow
+
+
+Windows DirectShow input device.
+
+DirectShow support is enabled when FFmpeg is built with the mingw-w64 project.
+Currently only audio and video devices are supported.
+
+Multiple devices may be opened as separate inputs, but they may also be
+opened on the same input, which should improve synchronism between them.
+
+The input name should be in the format:
+
+	
+	<TYPE>=<NAME>[:<TYPE>=<NAME>]
+
+
+where I<TYPE> can be either I<audio> or I<video>,
+and I<NAME> is the device's name.
+
+
+=head3 Options
+
+
+If no options are specified, the device's defaults are used.
+If the device does not support the requested options, it will
+fail to open.
+
+
+=over 4
+
+
+
+=item B<video_size>
+
+Set the video size in the captured video.
+
+
+=item B<framerate>
+
+Set the framerate in the captured video.
+
+
+=item B<sample_rate>
+
+Set the sample rate (in Hz) of the captured audio.
+
+
+=item B<sample_size>
+
+Set the sample size (in bits) of the captured audio.
+
+
+=item B<channels>
+
+Set the number of channels in the captured audio.
+
+
+=item B<list_devices>
+
+If set to B<true>, print a list of devices and exit.
+
+
+=item B<list_options>
+
+If set to B<true>, print a list of selected device's options
+and exit.
+
+
+=item B<video_device_number>
+
+Set video device number for devices with same name (starts at 0,
+defaults to 0).
+
+
+=item B<audio_device_number>
+
+Set audio device number for devices with same name (starts at 0,
+defaults to 0).
+
+
+=item B<pixel_format>
+
+Select pixel format to be used by DirectShow. This may only be set when
+the video codec is not set or set to rawvideo.
+
+
+=item B<audio_buffer_size>
+
+Set audio device buffer size in milliseconds (which can directly
+impact latency, depending on the device).
+Defaults to using the audio device's
+default buffer size (typically some multiple of 500ms).
+Setting this value too low can degrade performance.
+See also
+E<lt>B<http://msdn.microsoft.com/en-us/library/windows/desktop/dd377582(v=vs.85).aspx>E<gt>
+
+
+=back
+
+
+
+=head3 Examples
+
+
+
+=over 4
+
+
+
+=item *
+
+Print the list of DirectShow supported devices and exit:
+	
+	$ ffmpeg -list_devices true -f dshow -i dummy
+
+
+
+=item *
+
+Open video device I<Camera>:
+	
+	$ ffmpeg -f dshow -i video="Camera"
+
+
+
+=item *
+
+Open second video device with name I<Camera>:
+	
+	$ ffmpeg -f dshow -video_device_number 1 -i video="Camera"
+
+
+
+=item *
+
+Open video device I<Camera> and audio device I<Microphone>:
+	
+	$ ffmpeg -f dshow -i video="Camera":audio="Microphone"
+
+
+
+=item *
+
+Print the list of supported options in selected device and exit:
+	
+	$ ffmpeg -list_options true -f dshow -i video="Camera"
+
+
+
+=back
+
+
+
+=head2 dv1394
+
+
+Linux DV 1394 input device.
+
+
+=head2 fbdev
+
+
+Linux framebuffer input device.
+
+The Linux framebuffer is a graphic hardware-independent abstraction
+layer to show graphics on a computer monitor, typically on the
+console. It is accessed through a file device node, usually
+F</dev/fb0>.
+
+For more detailed information read the file
+Documentation/fb/framebuffer.txt included in the Linux source tree.
+
+To record from the framebuffer device F</dev/fb0> with
+B<ffmpeg>:
+	
+	ffmpeg -f fbdev -r 10 -i /dev/fb0 out.avi
+
+
+You can take a single screenshot image with the command:
+	
+	ffmpeg -f fbdev -frames:v 1 -r 1 -i /dev/fb0 screenshot.jpeg
+
+
+See also E<lt>B<http://linux-fbdev.sourceforge.net/>E<gt>, and fbset(1).
+
+
+=head2 iec61883
+
+
+FireWire DV/HDV input device using libiec61883.
+
+To enable this input device, you need libiec61883, libraw1394 and
+libavc1394 installed on your system. Use the configure option
+C<--enable-libiec61883> to compile with the device enabled.
+
+The iec61883 capture device supports capturing from a video device
+connected via IEEE1394 (FireWire), using libiec61883 and the new Linux
+FireWire stack (juju). This is the default DV/HDV input method in Linux
+Kernel 2.6.37 and later, since the old FireWire stack was removed.
+
+Specify the FireWire port to be used as input file, or "auto"
+to choose the first port connected.
+
+
+=head3 Options
+
+
+
+=over 4
+
+
+
+=item B<dvtype>
+
+Override autodetection of DV/HDV. This should only be used if auto
+detection does not work, or if usage of a different device type
+should be prohibited. Treating a DV device as HDV (or vice versa) will
+not work and result in undefined behavior.
+The values B<auto>, B<dv> and B<hdv> are supported.
+
+
+=item B<dvbuffer>
+
+Set maxiumum size of buffer for incoming data, in frames. For DV, this
+is an exact value. For HDV, it is not frame exact, since HDV does
+not have a fixed frame size.
+
+
+=back
+
+
+
+=head3 Examples
+
+
+
+=over 4
+
+
+
+=item *
+
+Grab and show the input of a FireWire DV/HDV device.
+	
+	ffplay -f iec61883 -i auto
+
+
+
+=item *
+
+Grab and record the input of a FireWire DV/HDV device,
+using a packet buffer of 100000 packets if the source is HDV.
+	
+	ffmpeg -f iec61883 -i auto -hdvbuffer 100000 out.mpg
+
+
+
+=back
+
+
+
+=head2 jack
+
+
+JACK input device.
+
+To enable this input device during configuration you need libjack
+installed on your system.
+
+A JACK input device creates one or more JACK writable clients, one for
+each audio channel, with name I<client_name>:input_I<N>, where
+I<client_name> is the name provided by the application, and I<N>
+is a number which identifies the channel.
+Each writable client will send the acquired data to the FFmpeg input
+device.
+
+Once you have created one or more JACK readable clients, you need to
+connect them to one or more JACK writable clients.
+
+To connect or disconnect JACK clients you can use the B<jack_connect>
+and B<jack_disconnect> programs, or do it through a graphical interface,
+for example with B<qjackctl>.
+
+To list the JACK clients and their properties you can invoke the command
+B<jack_lsp>.
+
+Follows an example which shows how to capture a JACK readable client
+with B<ffmpeg>.
+	
+	# Create a JACK writable client with name "ffmpeg".
+	$ ffmpeg -f jack -i ffmpeg -y out.wav
+	
+	# Start the sample jack_metro readable client.
+	$ jack_metro -b 120 -d 0.2 -f 4000
+	
+	# List the current JACK clients.
+	$ jack_lsp -c
+	system:capture_1
+	system:capture_2
+	system:playback_1
+	system:playback_2
+	ffmpeg:input_1
+	metro:120_bpm
+	
+	# Connect metro to the ffmpeg writable client.
+	$ jack_connect metro:120_bpm ffmpeg:input_1
+
+
+For more information read:
+E<lt>B<http://jackaudio.org/>E<gt>
+
+
+=head2 lavfi
+
+
+Libavfilter input virtual device.
+
+This input device reads data from the open output pads of a libavfilter
+filtergraph.
+
+For each filtergraph open output, the input device will create a
+corresponding stream which is mapped to the generated output. Currently
+only video data is supported. The filtergraph is specified through the
+option B<graph>.
+
+
+=head3 Options
+
+
+
+=over 4
+
+
+
+=item B<graph>
+
+Specify the filtergraph to use as input. Each video open output must be
+labelled by a unique string of the form "outI<N>", where I<N> is a
+number starting from 0 corresponding to the mapped input stream
+generated by the device.
+The first unlabelled output is automatically assigned to the "out0"
+label, but all the others need to be specified explicitly.
+
+If not specified defaults to the filename specified for the input
+device.
+
+
+=item B<graph_file>
+
+Set the filename of the filtergraph to be read and sent to the other
+filters. Syntax of the filtergraph is the same as the one specified by
+the option I<graph>.
+
+
+=back
+
+
+
+=head3 Examples
+
+
+
+=over 4
+
+
+=item *
+
+Create a color video stream and play it back with B<ffplay>:
+	
+	ffplay -f lavfi -graph "color=pink [out0]" dummy
+
+
+
+=item *
+
+As the previous example, but use filename for specifying the graph
+description, and omit the "out0" label:
+	
+	ffplay -f lavfi color=pink
+
+
+
+=item *
+
+Create three different video test filtered sources and play them:
+	
+	ffplay -f lavfi -graph "testsrc [out0]; testsrc,hflip [out1]; testsrc,negate [out2]" test3
+
+
+
+=item *
+
+Read an audio stream from a file using the amovie source and play it
+back with B<ffplay>:
+	
+	ffplay -f lavfi "amovie=test.wav"
+
+
+
+=item *
+
+Read an audio stream and a video stream and play it back with
+B<ffplay>:
+	
+	ffplay -f lavfi "movie=test.avi[out0];amovie=test.wav[out1]"
+
+
+
+=back
+
+
+
+=head2 libdc1394
+
+
+IIDC1394 input device, based on libdc1394 and libraw1394.
+
+
+=head2 openal
+
+
+The OpenAL input device provides audio capture on all systems with a
+working OpenAL 1.1 implementation.
+
+To enable this input device during configuration, you need OpenAL
+headers and libraries installed on your system, and need to configure
+FFmpeg with C<--enable-openal>.
+
+OpenAL headers and libraries should be provided as part of your OpenAL
+implementation, or as an additional download (an SDK). Depending on your
+installation you may need to specify additional flags via the
+C<--extra-cflags> and C<--extra-ldflags> for allowing the build
+system to locate the OpenAL headers and libraries.
+
+An incomplete list of OpenAL implementations follows:
+
+
+=over 4
+
+
+=item B<Creative>
+
+The official Windows implementation, providing hardware acceleration
+with supported devices and software fallback.
+See E<lt>B<http://openal.org/>E<gt>.
+
+=item B<OpenAL Soft>
+
+Portable, open source (LGPL) software implementation. Includes
+backends for the most common sound APIs on the Windows, Linux,
+Solaris, and BSD operating systems.
+See E<lt>B<http://kcat.strangesoft.net/openal.html>E<gt>.
+
+=item B<Apple>
+
+OpenAL is part of Core Audio, the official Mac OS X Audio interface.
+See E<lt>B<http://developer.apple.com/technologies/mac/audio-and-video.html>E<gt>
+
+=back
+
+
+This device allows to capture from an audio input device handled
+through OpenAL.
+
+You need to specify the name of the device to capture in the provided
+filename. If the empty string is provided, the device will
+automatically select the default device. You can get the list of the
+supported devices by using the option I<list_devices>.
+
+
+=head3 Options
+
+
+
+=over 4
+
+
+
+=item B<channels>
+
+Set the number of channels in the captured audio. Only the values
+B<1> (monaural) and B<2> (stereo) are currently supported.
+Defaults to B<2>.
+
+
+=item B<sample_size>
+
+Set the sample size (in bits) of the captured audio. Only the values
+B<8> and B<16> are currently supported. Defaults to
+B<16>.
+
+
+=item B<sample_rate>
+
+Set the sample rate (in Hz) of the captured audio.
+Defaults to B<44.1k>.
+
+
+=item B<list_devices>
+
+If set to B<true>, print a list of devices and exit.
+Defaults to B<false>.
+
+
+=back
+
+
+
+=head3 Examples
+
+
+Print the list of OpenAL supported devices and exit:
+	
+	$ ffmpeg -list_devices true -f openal -i dummy out.ogg
+
+
+Capture from the OpenAL device F<DR-BT101 via PulseAudio>:
+	
+	$ ffmpeg -f openal -i 'DR-BT101 via PulseAudio' out.ogg
+
+
+Capture from the default device (note the empty string '' as filename):
+	
+	$ ffmpeg -f openal -i '' out.ogg
+
+
+Capture from two devices simultaneously, writing to two different files,
+within the same B<ffmpeg> command:
+	
+	$ ffmpeg -f openal -i 'DR-BT101 via PulseAudio' out1.ogg -f openal -i 'ALSA Default' out2.ogg
+
+Note: not all OpenAL implementations support multiple simultaneous capture -
+try the latest OpenAL Soft if the above does not work.
+
+
+=head2 oss
+
+
+Open Sound System input device.
+
+The filename to provide to the input device is the device node
+representing the OSS input device, and is usually set to
+F</dev/dsp>.
+
+For example to grab from F</dev/dsp> using B<ffmpeg> use the
+command:
+	
+	ffmpeg -f oss -i /dev/dsp /tmp/oss.wav
+
+
+For more information about OSS see:
+E<lt>B<http://manuals.opensound.com/usersguide/dsp.html>E<gt>
+
+
+=head2 pulse
+
+
+pulseaudio input device.
+
+To enable this input device during configuration you need libpulse-simple
+installed in your system.
+
+The filename to provide to the input device is a source device or the
+string "default"
+
+To list the pulse source devices and their properties you can invoke
+the command B<pactl list sources>.
+
+	
+	ffmpeg -f pulse -i default /tmp/pulse.wav
+
+
+
+=head3 I<server> AVOption
+
+
+The syntax is:
+	
+	-server <server name>
+
+
+Connects to a specific server.
+
+
+=head3 I<name> AVOption
+
+
+The syntax is:
+	
+	-name <application name>
+
+
+Specify the application name pulse will use when showing active clients,
+by default it is the LIBAVFORMAT_IDENT string
+
+
+=head3 I<stream_name> AVOption
+
+
+The syntax is:
+	
+	-stream_name <stream name>
+
+
+Specify the stream name pulse will use when showing active streams,
+by default it is "record"
+
+
+=head3 I<sample_rate> AVOption
+
+
+The syntax is:
+	
+	-sample_rate <samplerate>
+
+
+Specify the samplerate in Hz, by default 48kHz is used.
+
+
+=head3 I<channels> AVOption
+
+
+The syntax is:
+	
+	-channels <N>
+
+
+Specify the channels in use, by default 2 (stereo) is set.
+
+
+=head3 I<frame_size> AVOption
+
+
+The syntax is:
+	
+	-frame_size <bytes>
+
+
+Specify the number of byte per frame, by default it is set to 1024.
+
+
+=head3 I<fragment_size> AVOption
+
+
+The syntax is:
+	
+	-fragment_size <bytes>
+
+
+Specify the minimal buffering fragment in pulseaudio, it will affect the
+audio latency. By default it is unset.
+
+
+=head2 sndio
+
+
+sndio input device.
+
+To enable this input device during configuration you need libsndio
+installed on your system.
+
+The filename to provide to the input device is the device node
+representing the sndio input device, and is usually set to
+F</dev/audio0>.
+
+For example to grab from F</dev/audio0> using B<ffmpeg> use the
+command:
+	
+	ffmpeg -f sndio -i /dev/audio0 /tmp/oss.wav
+
+
+
+=head2 video4linux2
+
+
+Video4Linux2 input video device.
+
+The name of the device to grab is a file device node, usually Linux
+systems tend to automatically create such nodes when the device
+(e.g. an USB webcam) is plugged into the system, and has a name of the
+kind F</dev/videoI<N>>, where I<N> is a number associated to
+the device.
+
+Video4Linux2 devices usually support a limited set of
+I<width>xI<height> sizes and framerates. You can check which are
+supported using B<-list_formats all> for Video4Linux2 devices.
+
+Some usage examples of the video4linux2 devices with ffmpeg and ffplay:
+
+The time base for the timestamps is 1 microsecond. Depending on the kernel
+version and configuration, the timestamps may be derived from the real time
+clock (origin at the Unix Epoch) or the monotonic clock (origin usually at
+boot time, unaffected by NTP or manual changes to the clock). The
+B<-timestamps abs> or B<-ts abs> option can be used to force
+conversion into the real time clock.
+
+Note that if FFmpeg is build with v4l-utils support ("--enable-libv4l2"
+option), it will always be used.
+	
+	# Grab and show the input of a video4linux2 device.
+	ffplay -f video4linux2 -framerate 30 -video_size hd720 /dev/video0
+	
+	# Grab and record the input of a video4linux2 device, leave the
+	framerate and size as previously set.
+	ffmpeg -f video4linux2 -input_format mjpeg -i /dev/video0 out.mpeg
+
+
+"v4l" and "v4l2" can be used as aliases for the respective "video4linux" and
+"video4linux2".
+
+
+=head2 vfwcap
+
+
+VfW (Video for Windows) capture input device.
+
+The filename passed as input is the capture driver number, ranging from
+0 to 9. You may use "list" as filename to print a list of drivers. Any
+other filename will be interpreted as device number 0.
+
+
+=head2 x11grab
+
+
+X11 video input device.
+
+This device allows to capture a region of an X11 display.
+
+The filename passed as input has the syntax:
+	
+	[<hostname>]:<display_number>.<screen_number>[+<x_offset>,<y_offset>]
+
+
+I<hostname>:I<display_number>.I<screen_number> specifies the
+X11 display name of the screen to grab from. I<hostname> can be
+omitted, and defaults to "localhost". The environment variable
+B<DISPLAY> contains the default display name.
+
+I<x_offset> and I<y_offset> specify the offsets of the grabbed
+area with respect to the top-left border of the X11 screen. They
+default to 0.
+
+Check the X11 documentation (e.g. man X) for more detailed information.
+
+Use the B<dpyinfo> program for getting basic information about the
+properties of your X11 display (e.g. grep for "name" or "dimensions").
+
+For example to grab from F<:0.0> using B<ffmpeg>:
+	
+	ffmpeg -f x11grab -r 25 -s cif -i :0.0 out.mpg
+
+
+Grab at position C<10,20>:
+	
+	ffmpeg -f x11grab -r 25 -s cif -i :0.0+10,20 out.mpg
+
+
+
+=head3 Options
+
+
+
+=over 4
+
+
+=item B<draw_mouse>
+
+Specify whether to draw the mouse pointer. A value of C<0> specify
+not to draw the pointer. Default value is C<1>.
+
+
+=item B<follow_mouse>
+
+Make the grabbed area follow the mouse. The argument can be
+C<centered> or a number of pixels I<PIXELS>.
+
+When it is specified with "centered", the grabbing region follows the mouse
+pointer and keeps the pointer at the center of region; otherwise, the region
+follows only when the mouse pointer reaches within I<PIXELS> (greater than
+zero) to the edge of region.
+
+For example:
+	
+	ffmpeg -f x11grab -follow_mouse centered -r 25 -s cif -i :0.0 out.mpg
+
+
+To follow only when the mouse pointer reaches within 100 pixels to edge:
+	
+	ffmpeg -f x11grab -follow_mouse 100 -r 25 -s cif -i :0.0 out.mpg
+
+
+
+=item B<framerate>
+
+Set the grabbing frame rate. Default value is C<ntsc>,
+corresponding to a framerate of C<30000/1001>.
+
+
+=item B<show_region>
+
+Show grabbed region on screen.
+
+If I<show_region> is specified with C<1>, then the grabbing
+region will be indicated on screen. With this option, it is easy to
+know what is being grabbed if only a portion of the screen is grabbed.
+
+For example:
+	
+	ffmpeg -f x11grab -show_region 1 -r 25 -s cif -i :0.0+10,20 out.mpg
+
+
+With I<follow_mouse>:
+	
+	ffmpeg -f x11grab -follow_mouse centered -show_region 1 -r 25 -s cif -i :0.0 out.mpg
+
+
+
+=item B<video_size>
+
+Set the video frame size. Default value is C<vga>.
+
+=back
+
+
+
+=head1 SEE ALSO
+
+ffmpeg(1), ffplay(1), ffserver(1) and the FFmpeg HTML documentation
+
+=head1 AUTHORS
+
+The FFmpeg developers
+

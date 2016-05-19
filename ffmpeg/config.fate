@@ -1,0 +1,1 @@
+config:x86:x86_32:pentium4:mingw32:gcc 4.6.2 (GCC):--enable-shared --enable-memalign-hack --extra-libs='-L/usr/local/lib -lx264 -lpthread' --extra-cflags=-I/usr/local/include --enable-gpl --enable-libx264 --cross-prefix=mingw32- --enable-cross-compile --target-os=mingw32 --arch=x86 --cpu=pentium4 --disable-stripping --disable-yasm

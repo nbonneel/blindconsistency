@@ -1,0 +1,392 @@
+EXPORTS
+    av_add_index_entry @1
+    av_append_packet @2
+    av_close_input_file @3
+    av_codec_get_id @4
+    av_codec_get_tag @5
+    av_convert_lang_to @6
+    av_demuxer_open @7
+    av_dump_format @8
+    av_filename_number_test @9
+    av_find_best_stream @10
+    av_find_default_stream_index @11
+    av_find_input_format @12
+    av_find_program_from_stream @13
+    av_find_stream_info @14
+    av_fmt_ctx_get_duration_estimation_method @15
+    av_get_frame_filename @16
+    av_get_output_timestamp @17
+    av_get_packet @18
+    av_gettime@LIBAVFORMAT_54 @19
+    av_guess_codec @20
+    av_guess_format @21
+    av_guess_sample_aspect_ratio @22
+    av_hex_dump @23
+    av_hex_dump_log @24
+    av_iformat_next @25
+    av_index_search_timestamp @26
+    av_interleave_packet_per_dts @27
+    av_interleaved_write_frame @28
+    av_match_ext @29
+    av_new_program @30
+    av_new_stream @31
+    av_oformat_next @32
+    av_pkt_dump2 @33
+    av_pkt_dump_log2 @34
+    av_probe_input_buffer @35
+    av_probe_input_format @36
+    av_probe_input_format2 @37
+    av_probe_input_format3 @38
+    av_read_frame @39
+    av_read_packet @40
+    av_read_pause @41
+    av_read_play @42
+    av_register_all @43
+    av_register_input_format @44
+    av_register_output_format @45
+    av_register_rdt_dynamic_payload_handlers @46
+    av_register_rtp_dynamic_payload_handlers @47
+    av_sdp_create @48
+    av_seek_frame @49
+    av_set_pts_info @50
+    av_url_split @51
+    av_write_frame @52
+    av_write_trailer @53
+    avformat_alloc_context @54
+    avformat_alloc_output_context @55
+    avformat_alloc_output_context2 @56
+    avformat_close_input @57
+    avformat_configuration @58
+    avformat_find_stream_info @59
+    avformat_free_context @60
+    avformat_get_class @61
+    avformat_get_riff_audio_tags @62
+    avformat_get_riff_video_tags @63
+    avformat_license @64
+    avformat_match_stream_specifier @65
+    avformat_network_deinit @66
+    avformat_network_init @67
+    avformat_new_stream @68
+    avformat_open_input @69
+    avformat_query_codec @70
+    avformat_queue_attached_pictures @71
+    avformat_seek_file @72
+    avformat_version @73
+    avformat_write_header @74
+    avio_alloc_context @75
+    avio_check @76
+    avio_close @77
+    avio_close_dyn_buf @78
+    avio_closep @79
+    avio_enum_protocols @80
+    avio_flush @81
+    avio_get_str @82
+    avio_get_str16be @83
+    avio_get_str16le @84
+    avio_open @85
+    avio_open2 @86
+    avio_open_dyn_buf @87
+    avio_pause @88
+    avio_printf @89
+    avio_put_str @90
+    avio_put_str16le @91
+    avio_r8 @92
+    avio_rb16 @93
+    avio_rb24 @94
+    avio_rb32 @95
+    avio_rb64 @96
+    avio_read @97
+    avio_rl16 @98
+    avio_rl24 @99
+    avio_rl32 @100
+    avio_rl64 @101
+    avio_seek @102
+    avio_seek_time @103
+    avio_size @104
+    avio_skip @105
+    avio_w8 @106
+    avio_wb16 @107
+    avio_wb24 @108
+    avio_wb32 @109
+    avio_wb64 @110
+    avio_wl16 @111
+    avio_wl24 @112
+    avio_wl32 @113
+    avio_wl64 @114
+    avio_write @115
+    avpriv_dv_get_packet @116
+    avpriv_dv_init_demux @117
+    avpriv_dv_produce_packet @118
+    avpriv_new_chapter @119
+    avpriv_set_pts_info @120
+    ff_inet_aton @121
+    ff_mpegts_parse_close @122
+    ff_mpegts_parse_open @123
+    ff_mpegts_parse_packet @124
+    ff_rtp_get_local_rtcp_port @125
+    ff_rtp_get_local_rtp_port @126
+    ff_rtsp_parse_line @127
+    ff_socket_nonblock @128
+    ffio_open_dyn_packet_buf @129
+    ffio_set_buf_size @130
+    ffurl_close @131
+    ffurl_open @132
+    ffurl_protocol_next @133
+    ffurl_read_complete @134
+    ffurl_seek @135
+    ffurl_size @136
+    ffurl_write @137
+    url_feof @138
+
+IMPORTS
+
+    libx264-129.dll._get_output_format
+    libx264-129.dll.x264_adaptive_quant_frame
+    libx264-129.dll.x264_analyse_free_costs
+    libx264-129.dll.x264_analyse_init_costs
+    libx264-129.dll.x264_analyse_prepare_costs
+    libx264-129.dll.x264_analyse_weight_frame
+    libx264-129.dll.x264_bit_depth
+    libx264-129.dll.x264_bitstream_init
+    libx264-129.dll.x264_cabac_context_init
+    libx264-129.dll.x264_cabac_contexts
+    libx264-129.dll.x264_cabac_encode_bypass_c
+    libx264-129.dll.x264_cabac_encode_decision_c
+    libx264-129.dll.x264_cabac_encode_flush
+    libx264-129.dll.x264_cabac_encode_init
+    libx264-129.dll.x264_cabac_encode_init_core
+    libx264-129.dll.x264_cabac_encode_terminal_c
+    libx264-129.dll.x264_cabac_encode_ue_bypass
+    libx264-129.dll.x264_cabac_entropy
+    libx264-129.dll.x264_cabac_init
+    libx264-129.dll.x264_cabac_mb_skip
+    libx264-129.dll.x264_cabac_range_lps
+    libx264-129.dll.x264_cabac_renorm_shift
+    libx264-129.dll.x264_cabac_size_unary
+    libx264-129.dll.x264_cabac_transition
+    libx264-129.dll.x264_cabac_transition_unary
+    libx264-129.dll.x264_cache_mv_func_table
+    libx264-129.dll.x264_cache_mvd_func_table
+    libx264-129.dll.x264_cache_ref_func_table
+    libx264-129.dll.x264_cavlc_init
+    libx264-129.dll.x264_chroma_format
+    libx264-129.dll.x264_coeff0_token
+    libx264-129.dll.x264_coeff_flag_offset_chroma_422_dc
+    libx264-129.dll.x264_coeff_token
+    libx264-129.dll.x264_copy_column8
+    libx264-129.dll.x264_cpu_detect
+    libx264-129.dll.x264_cpu_names
+    libx264-129.dll.x264_cpu_num_processors
+    libx264-129.dll.x264_cqm_delete
+    libx264-129.dll.x264_cqm_init
+    libx264-129.dll.x264_cqm_parse_file
+    libx264-129.dll.x264_dct4_weight2_tab
+    libx264-129.dll.x264_dct4_weight_tab
+    libx264-129.dll.x264_dct8_weight2_tab
+    libx264-129.dll.x264_dct8_weight_tab
+    libx264-129.dll.x264_dct_init
+    libx264-129.dll.x264_deblock_init
+    libx264-129.dll.x264_decimate_table4
+    libx264-129.dll.x264_decimate_table8
+    libx264-129.dll.x264_encoder_close
+    libx264-129.dll.x264_encoder_delayed_frames
+    libx264-129.dll.x264_encoder_encode
+    libx264-129.dll.x264_encoder_headers
+    libx264-129.dll.x264_encoder_intra_refresh
+    libx264-129.dll.x264_encoder_invalidate_reference
+    libx264-129.dll.x264_encoder_maximum_delayed_frames
+    libx264-129.dll.x264_encoder_open_129
+    libx264-129.dll.x264_encoder_parameters
+    libx264-129.dll.x264_encoder_reconfig
+    libx264-129.dll.x264_exp2_lut
+    libx264-129.dll.x264_expand_border_mbpair
+    libx264-129.dll.x264_field_vsad
+    libx264-129.dll.x264_filler_write
+    libx264-129.dll.x264_frame_cond_broadcast
+    libx264-129.dll.x264_frame_cond_wait
+    libx264-129.dll.x264_frame_copy_picture
+    libx264-129.dll.x264_frame_deblock_row
+    libx264-129.dll.x264_frame_delete
+    libx264-129.dll.x264_frame_delete_list
+    libx264-129.dll.x264_frame_expand_border
+    libx264-129.dll.x264_frame_expand_border_chroma
+    libx264-129.dll.x264_frame_expand_border_filtered
+    libx264-129.dll.x264_frame_expand_border_lowres
+    libx264-129.dll.x264_frame_expand_border_mod16
+    libx264-129.dll.x264_frame_filter
+    libx264-129.dll.x264_frame_init_lowres
+    libx264-129.dll.x264_frame_pop
+    libx264-129.dll.x264_frame_pop_blank_unused
+    libx264-129.dll.x264_frame_pop_unused
+    libx264-129.dll.x264_frame_push
+    libx264-129.dll.x264_frame_push_blank_unused
+    libx264-129.dll.x264_frame_push_unused
+    libx264-129.dll.x264_frame_shift
+    libx264-129.dll.x264_frame_unshift
+    libx264-129.dll.x264_free
+    libx264-129.dll.x264_hrd_fullness
+    libx264-129.dll.x264_intra_sa8d_x3_8x8
+    libx264-129.dll.x264_intra_sad_x3_16x16
+    libx264-129.dll.x264_intra_sad_x3_4x4
+    libx264-129.dll.x264_intra_sad_x3_8x16c
+    libx264-129.dll.x264_intra_sad_x3_8x8
+    libx264-129.dll.x264_intra_sad_x3_8x8c
+    libx264-129.dll.x264_intra_satd_x3_16x16
+    libx264-129.dll.x264_intra_satd_x3_4x4
+    libx264-129.dll.x264_intra_satd_x3_8x16c
+    libx264-129.dll.x264_intra_satd_x3_8x8c
+    libx264-129.dll.x264_iter_kludge
+    libx264-129.dll.x264_lambda2_tab
+    libx264-129.dll.x264_lambda_tab
+    libx264-129.dll.x264_last_coeff_flag_offset_8x8
+    libx264-129.dll.x264_level_token
+    libx264-129.dll.x264_levels
+    libx264-129.dll.x264_log
+    libx264-129.dll.x264_log2_lut
+    libx264-129.dll.x264_log2_lz_lut
+    libx264-129.dll.x264_lookahead_delete
+    libx264-129.dll.x264_lookahead_get_frames
+    libx264-129.dll.x264_lookahead_init
+    libx264-129.dll.x264_lookahead_is_empty
+    libx264-129.dll.x264_lookahead_put_frame
+    libx264-129.dll.x264_macroblock_analyse
+    libx264-129.dll.x264_macroblock_bipred_init
+    libx264-129.dll.x264_macroblock_cache_allocate
+    libx264-129.dll.x264_macroblock_cache_free
+    libx264-129.dll.x264_macroblock_cache_load_interlaced
+    libx264-129.dll.x264_macroblock_cache_load_progressive
+    libx264-129.dll.x264_macroblock_cache_save
+    libx264-129.dll.x264_macroblock_deblock
+    libx264-129.dll.x264_macroblock_deblock_strength
+    libx264-129.dll.x264_macroblock_encode
+    libx264-129.dll.x264_macroblock_encode_p4x4
+    libx264-129.dll.x264_macroblock_encode_p8x8
+    libx264-129.dll.x264_macroblock_probe_skip
+    libx264-129.dll.x264_macroblock_slice_init
+    libx264-129.dll.x264_macroblock_thread_allocate
+    libx264-129.dll.x264_macroblock_thread_free
+    libx264-129.dll.x264_macroblock_thread_init
+    libx264-129.dll.x264_macroblock_tree_read
+    libx264-129.dll.x264_macroblock_write_cabac
+    libx264-129.dll.x264_macroblock_write_cavlc
+    libx264-129.dll.x264_malloc
+    libx264-129.dll.x264_mb_encode_chroma
+    libx264-129.dll.x264_mb_mc
+    libx264-129.dll.x264_mb_mc_8x8
+    libx264-129.dll.x264_mb_predict_mv
+    libx264-129.dll.x264_mb_predict_mv_16x16
+    libx264-129.dll.x264_mb_predict_mv_direct16x16
+    libx264-129.dll.x264_mb_predict_mv_pskip
+    libx264-129.dll.x264_mb_predict_mv_ref16x16
+    libx264-129.dll.x264_mc_init
+    libx264-129.dll.x264_mdate
+    libx264-129.dll.x264_me_refine_bidir_rd
+    libx264-129.dll.x264_me_refine_bidir_satd
+    libx264-129.dll.x264_me_refine_qpel
+    libx264-129.dll.x264_me_refine_qpel_rd
+    libx264-129.dll.x264_me_refine_qpel_refdupe
+    libx264-129.dll.x264_me_search_ref
+    libx264-129.dll.x264_nal_encode
+    libx264-129.dll.x264_noise_reduction_update
+    libx264-129.dll.x264_param2string
+    libx264-129.dll.x264_param_apply_fastfirstpass
+    libx264-129.dll.x264_param_apply_profile
+    libx264-129.dll.x264_param_default
+    libx264-129.dll.x264_param_default_preset
+    libx264-129.dll.x264_param_parse
+    libx264-129.dll.x264_picture_alloc
+    libx264-129.dll.x264_picture_clean
+    libx264-129.dll.x264_picture_init
+    libx264-129.dll.x264_pixel_init
+    libx264-129.dll.x264_pixel_ssd_nv12
+    libx264-129.dll.x264_pixel_ssd_wxh
+    libx264-129.dll.x264_pixel_ssim_wxh
+    libx264-129.dll.x264_plane_copy_c
+    libx264-129.dll.x264_plane_copy_interleave_c
+    libx264-129.dll.x264_pps_init
+    libx264-129.dll.x264_pps_write
+    libx264-129.dll.x264_predict_16x16_dc_c
+    libx264-129.dll.x264_predict_16x16_h_c
+    libx264-129.dll.x264_predict_16x16_init
+    libx264-129.dll.x264_predict_16x16_p_c
+    libx264-129.dll.x264_predict_16x16_v_c
+    libx264-129.dll.x264_predict_4x4_dc_c
+    libx264-129.dll.x264_predict_4x4_h_c
+    libx264-129.dll.x264_predict_4x4_init
+    libx264-129.dll.x264_predict_4x4_v_c
+    libx264-129.dll.x264_predict_8x16c_dc_c
+    libx264-129.dll.x264_predict_8x16c_h_c
+    libx264-129.dll.x264_predict_8x16c_init
+    libx264-129.dll.x264_predict_8x16c_p_c
+    libx264-129.dll.x264_predict_8x16c_v_c
+    libx264-129.dll.x264_predict_8x8_dc_c
+    libx264-129.dll.x264_predict_8x8_h_c
+    libx264-129.dll.x264_predict_8x8_init
+    libx264-129.dll.x264_predict_8x8_v_c
+    libx264-129.dll.x264_predict_8x8c_dc_c
+    libx264-129.dll.x264_predict_8x8c_h_c
+    libx264-129.dll.x264_predict_8x8c_init
+    libx264-129.dll.x264_predict_8x8c_p_c
+    libx264-129.dll.x264_predict_8x8c_v_c
+    libx264-129.dll.x264_predict_lossless_16x16
+    libx264-129.dll.x264_predict_lossless_4x4
+    libx264-129.dll.x264_predict_lossless_8x8
+    libx264-129.dll.x264_predict_lossless_chroma
+    libx264-129.dll.x264_prefetch_fenc
+    libx264-129.dll.x264_quant_4x4_trellis
+    libx264-129.dll.x264_quant_8x8_trellis
+    libx264-129.dll.x264_quant_chroma_dc_trellis
+    libx264-129.dll.x264_quant_init
+    libx264-129.dll.x264_quant_luma_dc_trellis
+    libx264-129.dll.x264_ratecontrol_delete
+    libx264-129.dll.x264_ratecontrol_end
+    libx264-129.dll.x264_ratecontrol_init_reconfigurable
+    libx264-129.dll.x264_ratecontrol_mb
+    libx264-129.dll.x264_ratecontrol_mb_qp
+    libx264-129.dll.x264_ratecontrol_new
+    libx264-129.dll.x264_ratecontrol_qp
+    libx264-129.dll.x264_ratecontrol_set_weights
+    libx264-129.dll.x264_ratecontrol_slice_type
+    libx264-129.dll.x264_ratecontrol_start
+    libx264-129.dll.x264_ratecontrol_summary
+    libx264-129.dll.x264_rc_analyse_slice
+    libx264-129.dll.x264_rd_cost_part
+    libx264-129.dll.x264_rdo_init
+    libx264-129.dll.x264_reduce_fraction
+    libx264-129.dll.x264_reduce_fraction64
+    libx264-129.dll.x264_reference_build_list_optimal
+    libx264-129.dll.x264_run_before
+    libx264-129.dll.x264_sei_buffering_period_write
+    libx264-129.dll.x264_sei_dec_ref_pic_marking_write
+    libx264-129.dll.x264_sei_frame_packing_write
+    libx264-129.dll.x264_sei_pic_timing_write
+    libx264-129.dll.x264_sei_recovery_point_write
+    libx264-129.dll.x264_sei_version_write
+    libx264-129.dll.x264_sei_write
+    libx264-129.dll.x264_significant_coeff_flag_offset_8x8
+    libx264-129.dll.x264_slicetype_analyse
+    libx264-129.dll.x264_slicetype_decide
+    libx264-129.dll.x264_slurp_file
+    libx264-129.dll.x264_sps_init
+    libx264-129.dll.x264_sps_write
+    libx264-129.dll.x264_sync_frame_list_delete
+    libx264-129.dll.x264_sync_frame_list_init
+    libx264-129.dll.x264_sync_frame_list_pop
+    libx264-129.dll.x264_sync_frame_list_push
+    libx264-129.dll.x264_thread_sync_ratecontrol
+    libx264-129.dll.x264_threadpool_delete
+    libx264-129.dll.x264_threadpool_init
+    libx264-129.dll.x264_threadpool_run
+    libx264-129.dll.x264_threadpool_wait
+    libx264-129.dll.x264_threads_distribute_ratecontrol
+    libx264-129.dll.x264_threads_merge_ratecontrol
+    libx264-129.dll.x264_threadslice_cond_broadcast
+    libx264-129.dll.x264_threadslice_cond_wait
+    libx264-129.dll.x264_total_zeros
+    libx264-129.dll.x264_total_zeros_2x2_dc
+    libx264-129.dll.x264_total_zeros_2x4_dc
+    libx264-129.dll.x264_validate_levels
+    libx264-129.dll.x264_weight_none
+    libx264-129.dll.x264_weight_scale_plane
+    libx264-129.dll.x264_weighted_reference_duplicate
+    libx264-129.dll.x264_zigzag_init

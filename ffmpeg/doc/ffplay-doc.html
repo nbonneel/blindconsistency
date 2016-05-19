@@ -1,0 +1,538 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html401/loose.dtd">
+<html>
+<!-- Created on April, 22 2010 by texi2html 1.78 -->
+<!--
+Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
+            Karl Berry  <karl@freefriends.org>
+            Olaf Bachmann <obachman@mathematik.uni-kl.de>
+            and many others.
+Maintained by: Many creative people.
+Send bugs and suggestions to <texi2html-bug@nongnu.org>
+
+-->
+<head>
+<title>FFplay Documentation</title>
+
+<meta name="description" content="FFplay Documentation">
+<meta name="keywords" content="FFplay Documentation">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="texi2html 1.78">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+pre.display {font-family: serif}
+pre.format {font-family: serif}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+pre.smalldisplay {font-family: serif; font-size: smaller}
+pre.smallexample {font-size: smaller}
+pre.smallformat {font-family: serif; font-size: smaller}
+pre.smalllisp {font-size: smaller}
+span.roman {font-family:serif; font-weight:normal;}
+span.sansserif {font-family:sans-serif; font-weight:normal;}
+ul.toc {list-style: none}
+-->
+</style>
+
+
+</head>
+
+<body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000">
+
+<a name="SEC1"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[ &lt; ]</td>
+<td valign="middle" align="left">[<a href="#SEC2" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[ &lt;&lt; ]</td>
+<td valign="middle" align="left">[ Up ]</td>
+<td valign="middle" align="left">[<a href="#SEC2" title="Next chapter"> &gt;&gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC1" title="Cover (top) of document">Top</a>]</td>
+<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[Index]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h1 class="chapter"> 1. Introduction </h1>
+
+<p>FFplay is a very simple and portable media player using the FFmpeg
+libraries and the SDL library. It is mostly used as a testbed for the
+various FFmpeg APIs.
+</p>
+<hr size="6">
+<a name="SEC2"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC1" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC3" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC1" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC1" title="Up section"> Up </a>]</td>
+<td valign="middle" align="left">[ &gt;&gt; ]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC1" title="Cover (top) of document">Top</a>]</td>
+<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[Index]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h1 class="chapter"> 2. Invocation </h1>
+
+<hr size="6">
+<a name="SEC3"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC2" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC4" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC2" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC2" title="Up section"> Up </a>]</td>
+<td valign="middle" align="left">[ &gt;&gt; ]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC1" title="Cover (top) of document">Top</a>]</td>
+<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[Index]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 2.1 Syntax </h2>
+<table><tr><td>&nbsp;</td><td><pre class="example">ffplay [options] &lsquo;<tt>input_file</tt>&rsquo;
+</pre></td></tr></table>
+
+
+<hr size="6">
+<a name="SEC4"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC3" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC5" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC2" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC2" title="Up section"> Up </a>]</td>
+<td valign="middle" align="left">[ &gt;&gt; ]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC1" title="Cover (top) of document">Top</a>]</td>
+<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[Index]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 2.2 Generic options </h2>
+
+<p>These options are shared amongst the ff* tools.
+</p>
+<dl compact="compact">
+<dt> &lsquo;<samp>-L</samp>&rsquo;</dt>
+<dd><p>Show license.
+</p>
+</dd>
+<dt> &lsquo;<samp>-h, -?, -help, --help</samp>&rsquo;</dt>
+<dd><p>Show help.
+</p>
+</dd>
+<dt> &lsquo;<samp>-version</samp>&rsquo;</dt>
+<dd><p>Show version.
+</p>
+</dd>
+<dt> &lsquo;<samp>-formats</samp>&rsquo;</dt>
+<dd><p>Show available formats.
+</p>
+<p>The fields preceding the format names have the following meanings:
+</p><dl compact="compact">
+<dt> &lsquo;<samp>D</samp>&rsquo;</dt>
+<dd><p>Decoding available
+</p></dd>
+<dt> &lsquo;<samp>E</samp>&rsquo;</dt>
+<dd><p>Encoding available
+</p></dd>
+</dl>
+
+</dd>
+<dt> &lsquo;<samp>-codecs</samp>&rsquo;</dt>
+<dd><p>Show available codecs.
+</p>
+<p>The fields preceding the codec names have the following meanings:
+</p><dl compact="compact">
+<dt> &lsquo;<samp>D</samp>&rsquo;</dt>
+<dd><p>Decoding available
+</p></dd>
+<dt> &lsquo;<samp>E</samp>&rsquo;</dt>
+<dd><p>Encoding available
+</p></dd>
+<dt> &lsquo;<samp>V/A/S</samp>&rsquo;</dt>
+<dd><p>Video/audio/subtitle codec
+</p></dd>
+<dt> &lsquo;<samp>S</samp>&rsquo;</dt>
+<dd><p>Codec supports slices
+</p></dd>
+<dt> &lsquo;<samp>D</samp>&rsquo;</dt>
+<dd><p>Codec supports direct rendering
+</p></dd>
+<dt> &lsquo;<samp>T</samp>&rsquo;</dt>
+<dd><p>Codec can handle input truncated at random locations instead of only at frame boundaries
+</p></dd>
+</dl>
+
+</dd>
+<dt> &lsquo;<samp>-bsfs</samp>&rsquo;</dt>
+<dd><p>Show available bitstream filters.
+</p>
+</dd>
+<dt> &lsquo;<samp>-protocols</samp>&rsquo;</dt>
+<dd><p>Show available protocols.
+</p>
+</dd>
+<dt> &lsquo;<samp>-filters</samp>&rsquo;</dt>
+<dd><p>Show available libavfilter filters.
+</p>
+</dd>
+<dt> &lsquo;<samp>-pix_fmts</samp>&rsquo;</dt>
+<dd><p>Show available pixel formats.
+</p>
+</dd>
+<dt> &lsquo;<samp>-loglevel <var>loglevel</var></samp>&rsquo;</dt>
+<dd><p>Set the logging level used by the library.
+<var>loglevel</var> is a number or a string containing one of the following values:
+</p><dl compact="compact">
+<dt> &lsquo;<samp>quiet</samp>&rsquo;</dt>
+<dt> &lsquo;<samp>panic</samp>&rsquo;</dt>
+<dt> &lsquo;<samp>fatal</samp>&rsquo;</dt>
+<dt> &lsquo;<samp>error</samp>&rsquo;</dt>
+<dt> &lsquo;<samp>warning</samp>&rsquo;</dt>
+<dt> &lsquo;<samp>info</samp>&rsquo;</dt>
+<dt> &lsquo;<samp>verbose</samp>&rsquo;</dt>
+<dt> &lsquo;<samp>debug</samp>&rsquo;</dt>
+</dl>
+
+</dd>
+</dl>
+
+<hr size="6">
+<a name="SEC5"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC4" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC6" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC2" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC2" title="Up section"> Up </a>]</td>
+<td valign="middle" align="left">[ &gt;&gt; ]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC1" title="Cover (top) of document">Top</a>]</td>
+<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[Index]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 2.3 Main options </h2>
+
+<dl compact="compact">
+<dt> &lsquo;<samp>-x <var>width</var></samp>&rsquo;</dt>
+<dd><p>Force displayed width.
+</p></dd>
+<dt> &lsquo;<samp>-y <var>height</var></samp>&rsquo;</dt>
+<dd><p>Force displayed height.
+</p></dd>
+<dt> &lsquo;<samp>-s <var>size</var></samp>&rsquo;</dt>
+<dd><p>Set frame size (WxH or abbreviation), needed for videos which don't
+contain a header with the frame size like raw YUV.
+</p></dd>
+<dt> &lsquo;<samp>-an</samp>&rsquo;</dt>
+<dd><p>Disable audio.
+</p></dd>
+<dt> &lsquo;<samp>-vn</samp>&rsquo;</dt>
+<dd><p>Disable video.
+</p></dd>
+<dt> &lsquo;<samp>-ss <var>pos</var></samp>&rsquo;</dt>
+<dd><p>Seek to a given position in seconds.
+</p></dd>
+<dt> &lsquo;<samp>-t <var>duration</var></samp>&rsquo;</dt>
+<dd><p>play &lt;duration&gt; seconds of audio/video
+</p></dd>
+<dt> &lsquo;<samp>-bytes</samp>&rsquo;</dt>
+<dd><p>Seek by bytes.
+</p></dd>
+<dt> &lsquo;<samp>-nodisp</samp>&rsquo;</dt>
+<dd><p>Disable graphical display.
+</p></dd>
+<dt> &lsquo;<samp>-f <var>fmt</var></samp>&rsquo;</dt>
+<dd><p>Force format.
+</p></dd>
+<dt> &lsquo;<samp>-window_title <var>title</var></samp>&rsquo;</dt>
+<dd><p>Set window title (default is the input filename).
+</p></dd>
+<dt> &lsquo;<samp>-loop <var>number</var></samp>&rsquo;</dt>
+<dd><p>Loops movie playback &lt;number&gt; times. 0 means forever.
+</p></dd>
+</dl>
+
+<hr size="6">
+<a name="SEC6"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC5" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC7" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC2" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC2" title="Up section"> Up </a>]</td>
+<td valign="middle" align="left">[ &gt;&gt; ]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC1" title="Cover (top) of document">Top</a>]</td>
+<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[Index]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 2.4 Advanced options </h2>
+<dl compact="compact">
+<dt> &lsquo;<samp>-pix_fmt <var>format</var></samp>&rsquo;</dt>
+<dd><p>Set pixel format.
+</p></dd>
+<dt> &lsquo;<samp>-stats</samp>&rsquo;</dt>
+<dd><p>Show the stream duration, the codec parameters, the current position in
+the stream and the audio/video synchronisation drift.
+</p></dd>
+<dt> &lsquo;<samp>-debug</samp>&rsquo;</dt>
+<dd><p>Print specific debug info.
+</p></dd>
+<dt> &lsquo;<samp>-bug</samp>&rsquo;</dt>
+<dd><p>Work around bugs.
+</p></dd>
+<dt> &lsquo;<samp>-vismv</samp>&rsquo;</dt>
+<dd><p>Visualize motion vectors.
+</p></dd>
+<dt> &lsquo;<samp>-fast</samp>&rsquo;</dt>
+<dd><p>Non-spec-compliant optimizations.
+</p></dd>
+<dt> &lsquo;<samp>-genpts</samp>&rsquo;</dt>
+<dd><p>Generate pts.
+</p></dd>
+<dt> &lsquo;<samp>-rtp_tcp</samp>&rsquo;</dt>
+<dd><p>Force RTP/TCP protocol usage instead of RTP/UDP. It is only meaningful
+if you are streaming with the RTSP protocol.
+</p></dd>
+<dt> &lsquo;<samp>-sync <var>type</var></samp>&rsquo;</dt>
+<dd><p>Set the master clock to audio (<code>type=audio</code>), video
+(<code>type=video</code>) or external (<code>type=ext</code>). Default is audio. The
+master clock is used to control audio-video synchronization. Most media
+players use audio as master clock, but in some cases (streaming or high
+quality broadcast) it is necessary to change that. This option is mainly
+used for debugging purposes.
+</p></dd>
+<dt> &lsquo;<samp>-threads <var>count</var></samp>&rsquo;</dt>
+<dd><p>Set the thread count.
+</p></dd>
+<dt> &lsquo;<samp>-ast <var>audio_stream_number</var></samp>&rsquo;</dt>
+<dd><p>Select the desired audio stream number, counting from 0. The number
+refers to the list of all the input audio streams. If it is greater
+than the number of audio streams minus one, then the last one is
+selected, if it is negative the audio playback is disabled.
+</p></dd>
+<dt> &lsquo;<samp>-vst <var>video_stream_number</var></samp>&rsquo;</dt>
+<dd><p>Select the desired video stream number, counting from 0. The number
+refers to the list of all the input video streams. If it is greater
+than the number of video streams minus one, then the last one is
+selected, if it is negative the video playback is disabled.
+</p></dd>
+<dt> &lsquo;<samp>-sst <var>subtitle_stream_number</var></samp>&rsquo;</dt>
+<dd><p>Select the desired subtitle stream number, counting from 0. The number
+refers to the list of all the input subtitle streams. If it is greater
+than the number of subtitle streams minus one, then the last one is
+selected, if it is negative the subtitle rendering is disabled.
+</p></dd>
+</dl>
+
+<hr size="6">
+<a name="SEC7"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC6" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[ &gt; ]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC2" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC2" title="Up section"> Up </a>]</td>
+<td valign="middle" align="left">[ &gt;&gt; ]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC1" title="Cover (top) of document">Top</a>]</td>
+<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[Index]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 2.5 While playing </h2>
+
+<dl compact="compact">
+<dt> &lt;q, ESC&gt;</dt>
+<dd><p>Quit.
+</p>
+</dd>
+<dt> &lt;f&gt;</dt>
+<dd><p>Toggle full screen.
+</p>
+</dd>
+<dt> &lt;p, SPC&gt;</dt>
+<dd><p>Pause.
+</p>
+</dd>
+<dt> &lt;a&gt;</dt>
+<dd><p>Cycle audio channel.
+</p>
+</dd>
+<dt> &lt;v&gt;</dt>
+<dd><p>Cycle video channel.
+</p>
+</dd>
+<dt> &lt;t&gt;</dt>
+<dd><p>Cycle subtitle channel.
+</p>
+</dd>
+<dt> &lt;w&gt;</dt>
+<dd><p>Show audio waves.
+</p>
+</dd>
+<dt> &lt;left/right&gt;</dt>
+<dd><p>Seek backward/forward 10 seconds.
+</p>
+</dd>
+<dt> &lt;down/up&gt;</dt>
+<dd><p>Seek backward/forward 1 minute.
+</p>
+</dd>
+<dt> &lt;mouse click&gt;</dt>
+<dd><p>Seek to percentage in file corresponding to fraction of width.
+</p>
+</dd>
+</dl>
+
+
+
+<hr size="6">
+<a name="SEC_About"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC1" title="Cover (top) of document">Top</a>]</td>
+<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[Index]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h1>About This Document</h1>
+<p>
+  This document was generated on <i>April, 22 2010</i> using <a href="http://www.nongnu.org/texi2html/"><i>texi2html 1.78</i></a>.
+</p>
+<p>
+  The buttons in the navigation panels have the following meaning:
+</p>
+<table border="1">
+  <tr>
+    <th> Button </th>
+    <th> Name </th>
+    <th> Go to </th>
+    <th> From 1.2.3 go to</th>
+  </tr>
+  <tr>
+    <td align="center"> [ &lt; ] </td>
+    <td align="center">Back</td>
+    <td>Previous section in reading order</td>
+    <td>1.2.2</td>
+  </tr>
+  <tr>
+    <td align="center"> [ &gt; ] </td>
+    <td align="center">Forward</td>
+    <td>Next section in reading order</td>
+    <td>1.2.4</td>
+  </tr>
+  <tr>
+    <td align="center"> [ &lt;&lt; ] </td>
+    <td align="center">FastBack</td>
+    <td>Beginning of this chapter or previous chapter</td>
+    <td>1</td>
+  </tr>
+  <tr>
+    <td align="center"> [ Up ] </td>
+    <td align="center">Up</td>
+    <td>Up section</td>
+    <td>1.2</td>
+  </tr>
+  <tr>
+    <td align="center"> [ &gt;&gt; ] </td>
+    <td align="center">FastForward</td>
+    <td>Next chapter</td>
+    <td>2</td>
+  </tr>
+  <tr>
+    <td align="center"> [Top] </td>
+    <td align="center">Top</td>
+    <td>Cover (top) of document</td>
+    <td> &nbsp; </td>
+  </tr>
+  <tr>
+    <td align="center"> [Contents] </td>
+    <td align="center">Contents</td>
+    <td>Table of contents</td>
+    <td> &nbsp; </td>
+  </tr>
+  <tr>
+    <td align="center"> [Index] </td>
+    <td align="center">Index</td>
+    <td>Index</td>
+    <td> &nbsp; </td>
+  </tr>
+  <tr>
+    <td align="center"> [ ? ] </td>
+    <td align="center">About</td>
+    <td>About (help)</td>
+    <td> &nbsp; </td>
+  </tr>
+</table>
+
+<p>
+  where the <strong> Example </strong> assumes that the current position is at <strong> Subsubsection One-Two-Three </strong> of a document of the following structure:
+</p>
+
+<ul>
+  <li> 1. Section One
+    <ul>
+      <li>1.1 Subsection One-One
+        <ul>
+          <li>...</li>
+        </ul>
+      </li>
+      <li>1.2 Subsection One-Two
+        <ul>
+          <li>1.2.1 Subsubsection One-Two-One</li>
+          <li>1.2.2 Subsubsection One-Two-Two</li>
+          <li>1.2.3 Subsubsection One-Two-Three &nbsp; &nbsp;
+            <strong>&lt;== Current Position </strong></li>
+          <li>1.2.4 Subsubsection One-Two-Four</li>
+        </ul>
+      </li>
+      <li>1.3 Subsection One-Three
+        <ul>
+          <li>...</li>
+        </ul>
+      </li>
+      <li>1.4 Subsection One-Four</li>
+    </ul>
+  </li>
+</ul>
+
+<hr size="1">
+<p>
+ <font size="-1">
+  This document was generated on <i>April, 22 2010</i> using <a href="http://www.nongnu.org/texi2html/"><i>texi2html 1.78</i></a>.
+ </font>
+ <br>
+
+</p>
+</body>
+</html>
