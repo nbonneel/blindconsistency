@@ -1,13 +1,14 @@
 # Blind Video Temporal Consistency
-## SIGGRAPH Asia 2015
 
-Nicolas Bonneel - CNRS LIRIS
-James Tompkin - Harvard Paulson SEAS
-Kalyan Sunkavalli - Adobe
-Deqing Sun - NVIDIA
-Sylvain Paris - Adobe
-Hanspeter Pfister - Harvard Paulson SEAS
----
+Published at SIGGRAPH Asia 2015.
+
+Authors:
+- Nicolas Bonneel - CNRS LIRIS
+- James Tompkin - Harvard Paulson SEAS
+- Kalyan Sunkavalli - Adobe
+- Deqing Sun - NVIDIA
+- Sylvain Paris - Adobe
+- Hanspeter Pfister - Harvard Paulson SEAS
 
 ## Description
 
@@ -15,8 +16,9 @@ This code implements this paper. It takes a processed or stylized video, say by 
 
 [Project webpage](http://liris.cnrs.fr/~nbonneel/consistency/)
 
-Video (click through):
-[![Project video](http://img.youtube.com/vi/reiT2SJh96U/0.jpg)](http://www.youtube.com/watch?v=reiT2SJh96U)
+Video (YouTube):
+
+<iframe width="1280" height="720" src="https://www.youtube.com/embed/reiT2SJh96U" frameborder="0" allowfullscreen></iframe>
 
 ## Compilation
 
