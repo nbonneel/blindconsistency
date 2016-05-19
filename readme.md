@@ -16,21 +16,20 @@ This code implements this paper. It takes a processed or stylized video, say by 
 
 [Project webpage](http://liris.cnrs.fr/~nbonneel/consistency/)
 
-Video (YouTube):
+Video (YouTube link):
 
-<iframe width="1280" height="720" src="https://www.youtube.com/embed/reiT2SJh96U" frameborder="0" allowfullscreen></iframe>
+[![Project video](http://img.youtube.com/vi/reiT2SJh96U/0.jpg)](http://www.youtube.com/watch?v=reiT2SJh96U)
 
 ## Compilation
 
-Tested to compile in Visual Studio 2013 or greater.
-Depends on FFmpeg, PatchMatch, and CImg.
+Tested to compile in Visual Studio 2013 or greater, but it should also work on older versions.
+There are no specific Windows functions, either, so it should compile on MacOS / Linux also, but this is untested.
 
 ## Dependencies - included
 
-[FFmpeg](http://ffmpeg.org/)
-[FFmpeg Windows builds](http://ffmpeg.zeranoe.com/builds/)
-[Barnes et al., PatchMatch, SIGGRAPH 2009](http://gfx.cs.princeton.edu/pubs/Barnes_2009_PAR/index.php)
-[CImg](http://www.cimg.eu/)
+- [FFmpeg](http://ffmpeg.org/) / [FFmpeg Windows builds](http://ffmpeg.zeranoe.com/builds/)
+- [Barnes et al., PatchMatch, SIGGRAPH 2009](http://gfx.cs.princeton.edu/pubs/Barnes_2009_PAR/index.php)
+- [CImg](http://www.cimg.eu/)
 
 ## Licence
 
